@@ -2,21 +2,21 @@ import mongoose,{Schema, model} from 'mongoose'
 const userSchema =  new Schema({
     email: {
         type: String,       
-         required: true,
+        required: [true, ' email is required'],
         unique: true
     },
     first_name: {
         type: String,
-        required: true
+        required: [true, 'first_name  is required'],
     },
     last_name: {
         type: String,
-        required: true
+        required: [true, 'last_name is required'],
     },
     phone: {
         type: String,
     },
-    pio: {
+    bio: {
         type: String,
     },
     state_us: {
@@ -25,7 +25,7 @@ const userSchema =  new Schema({
     admin_email: {
         type: String,
     },
-    barth_date: {
+    birth_date: {
         type: Date,
         // required: true,
         // default: new Date()
@@ -39,10 +39,14 @@ const userSchema =  new Schema({
         type: String,
     },
     profile_cover: {
-        type: Buffer,
+        type: Object,
         contentType: String,
+    },
+    role:{
+type:String, 
+default: " "
     }
-});
+})
 
 userSchema.index({ email: 1 }, { unique: true });
 
