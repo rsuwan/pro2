@@ -1,6 +1,6 @@
 import mongoose,{Schema, model} from 'mongoose'
 
-const userSchema =  new Schema({
+const logSchema =  new Schema({
     email: {
         type: String,
         required: true
@@ -15,6 +15,5 @@ const userSchema =  new Schema({
         required: true
     }
 });
-
-logSchema.index({ email: 1 }, { unique: true });
-module.exports = mongoose.model('log', logSchema);
+const logModel= mongoose.models.Log||model('Log',logSchema);
+export default logModel;

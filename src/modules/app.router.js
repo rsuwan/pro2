@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import CommunityRouter from './Community/Community.router.js';
 import PostRouter from './Post/post.router.js';
+import AuthRouter from './Auth/atuh.router.js';
 import connectdb from '../../db/connection.js';
 
 const initapp = (app, express) => {
@@ -12,7 +13,7 @@ connectdb();
         return res.status(200).json({ message: "Welcome" });
     });
 
-    
+    app.use('/auth',AuthRouter);
     app.use('/community', CommunityRouter);
     app.use('/post', PostRouter);;
 

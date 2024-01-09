@@ -1,17 +1,29 @@
 import mongoose,{Schema, model} from 'mongoose'
 const userSchema =  new Schema({
     email: {
-        type: String,       
-        required: [true, ' email is required'],
-        unique: true
-    },
-    first_name: {
         type: String,
-        required: [true, 'first_name  is required'],
+        required: [true, 'Email is required'],
+        unique: true,
+        trim: true,
+        lowercase: true,
+        match: [
+            /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
+            'Please enter a valid email address'
+        ]
     },
-    last_name: {
+    firstName: {
         type: String,
-        required: [true, 'last_name is required'],
+        required: [true, 'First name is required'],
+        trim: true,
+        minlength: 2,
+        maxlength: 50
+    },
+    lastName: {
+        type: String,
+        required: [true, 'Last name is required'],
+        trim: true,
+        minlength: 2,
+        maxlength: 50
     },
     phone: {
         type: String,
@@ -20,34 +32,36 @@ const userSchema =  new Schema({
         type: String,
     },
     state_us: {
-        type: Boolean,
+        type: String,
+        default:'Active',
+        enum:['Active','InActive']
+
     },
     admin_email: {
         type: String,
     },
     birth_date: {
         type: Date,
-        // required: true,
-        // default: new Date()
+    
     },
     created_date: {
         type: Date,
-        // required: true,
+        required: true,
         default: new Date()
+        
     },
     address: {
         type: String,
     },
     profile_cover: {
         type: Object,
-        contentType: String,
-    },
-    role:{
-type:String, 
-default: " "
+        
     }
+
+},{
+
+    timestamps:true,
 })
 
-userSchema.index({ email: 1 }, { unique: true });
-
-module.exports = mongoose.model('user', userSchema);
+const userModel= mongoose.models.User||model('User',userSchema);
+export default userModel;
