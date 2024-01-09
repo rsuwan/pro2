@@ -4,7 +4,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
 export const SignUp = async (req, res) => {
-  const { firstName, lastName, emai, password } = req.body;
+  const { firstName, lastName,email , password } = req.body;
 
   try {
     const user = await userModel.findOne({ email });
