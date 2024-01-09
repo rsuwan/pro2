@@ -10,23 +10,13 @@ const communitySchema =  new Schema({
         type: String,
         required: true
     },
-    slug:{
-        type: String,
-        required: true
-    },
     created_by: {
         type: Types.ObjectId,ref:'Admin'
     },
     cover_image: {
         type: Object,
 
-    },
-    state_us: {
-        type: String,
-        default:'Active',
-        enum:['Active','InActive']
-
-    }},{
+    },{
 
         timestamps:true,
     })
