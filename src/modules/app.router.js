@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import CommunityRouter from './Community/Community.router.js';
+import CommunityRouter from './Community/community.controller.js';
 import PostRouter from './Post/post.router.js';
 import AuthRouter from './Auth/atuh.router.js';
 import connectdb from '../../db/connection.js';
@@ -14,9 +14,8 @@ connectdb();
     });
 
     app.use('/auth',AuthRouter);
-    app.use('/community', CommunityRouter);
-    app.use('/post', PostRouter);;
-
+    app.use('/post', PostRouter);
+    app.use('/community', CommunityRouter);;
     app.get('*', (req, res) => {
         return res.status(404).json({ message: "Page not found" });
     });

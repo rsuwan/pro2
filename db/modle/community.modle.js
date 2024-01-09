@@ -1,34 +1,34 @@
-import mongoose,{Schema, model,Types} from 'mongoose'
-const communitySchema =  new Schema({
-   
+// community.modle.js
+import mongoose from "mongoose";
+
+const { Schema } = mongoose;
+
+const communitySchema = new Schema({
     community_name: {
         type: String,
         required: true,
-        unique: true
     },
-    descreption: {
+    description: {
         type: String,
-        required: true
+        required: true,
     },
-    slug:{
+    creater_email: {
         type: String,
-        required: true
+        // required: true
     },
-    created_by: {
-        type: Types.ObjectId,ref:'Admin'
+    created_date: {
+        type: Date,
+        required: true,
+        default: new Date(),
     },
     cover_image: {
         type: Object,
-
     },
-    state_us: {
-        type: String,
-        default:'Active',
-        enum:['Active','InActive']
 
-    }},{
+},{
 
-        timestamps:true,
-    })
-const communityModel= mongoose.models.Community||model('Community',communitySchema);
-export default communityModel;
+    timestamps:true,
+})
+const Community = mongoose.model("Community", communitySchema);
+
+export default Community;
