@@ -1,28 +1,44 @@
-import { Router } from 'express';
-import CommunityRouter from './Community/community.controller.js';
-import PostRouter from './Post/post.router.js';
-import AuthRouter from './Auth/atuh.router.js';
-import connectdb from '../../db/connection.js';
+import { Router } from "express";
+import CommunityRouter from "./Community/Community.router.js";
+import PostRouter from "./Post/post.router.js";
+import AuthRouter from "./Auth/atuh.router.js";
+import connectdb from "../../db/connection.js";
+import { sendemail } from "../services/email.js";
+import cors from 'cors'
+const initapp = async (app, express) => {
+  const router = Router();
 
-const initapp = (app, express) => {
-    const router = Router();
+  app.use(express.json());
+  app.use(cors())
+  // Connect to the database
+  try {
+    await connectdb();
+    console.log("Database connected");
+  } catch (error) {
+    console.error(error);
+    process.exit(1);
+  }
 
-    app.use(express.json());
-connectdb();
-    app.get('/', (req, res) => {
-        return res.status(200).json({ message: "Welcome" });
-    });
+  // Send the email
+  try {
+    await sendemail("r.r.suwan2001@gmail.com", "test", "<h2>hi</h2>");
+    console.log("Email sent");
+  } catch (error) {
+    console.error(error);
+  }
 
-    app.use('/auth',AuthRouter);
-    app.use('/post', PostRouter);
-    app.use('/community', CommunityRouter);;
-    app.get('*', (req, res) => {
-        return res.status(404).json({ message: "Page not found" });
-    });
+  // Set up the routes
+  app.get("/", (req, res) => {
+    return res.status(200).json({ message: "Welcome" });
+  });
 
-    
+  app.use("/auth", AuthRouter);
+  app.use("/post", PostRouter);
+  app.use("/community", CommunityRouter);
+
+  app.get("*", (req, res) => {
+    return res.status(404).json({ message: "Page not found" });
+  });
 };
 
 export default initapp;
-
-

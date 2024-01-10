@@ -1,67 +1,68 @@
-import mongoose,{Schema, model} from 'mongoose'
-const userSchema =  new Schema({
+import mongoose, { Schema, model } from "mongoose";
+const userSchema = new Schema(
+  {
     email: {
-        type: String,
-        required: [true, 'Email is required'],
-        unique: true,
-        trim: true,
-        lowercase: true,
-        match: [
-            /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
-            'Please enter a valid email address'
-        ]
+      type: String,
+      required: [true, "Email is required"],
+      unique: true,
+      trim: true,
+      lowercase: true,
+      match: [
+        /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
+        "Please enter a valid email address",
+      ],
+    },
+    confirmEmail: {
+      type: Boolean,
+      default: false,
     },
     firstName: {
-        type: String,
-        required: [true, 'First name is required'],
-        trim: true,
-        minlength: 2,
-        maxlength: 50
+      type: String,
+      required: [true, "First name is required"],
+      trim: true,
+      minlength: 2,
+      maxlength: 50,
     },
     lastName: {
-        type: String,
-        required: [true, 'Last name is required'],
-        trim: true,
-        minlength: 2,
-        maxlength: 50
+      type: String,
+      required: [true, "Last name is required"],
+      trim: true,
+      minlength: 2,
+      maxlength: 50,
     },
     phone: {
-        type: String,
+      type: String,
     },
     bio: {
-        type: String,
+      type: String,
     },
     state_us: {
-        type: String,
-        default:'Active',
-        enum:['Active','InActive']
-
+      type: String,
+      default: "Active",
+      enum: ["Active", "InActive"],
     },
     admin_email: {
-        type: String,
+      type: String,
     },
     birth_date: {
-        type: Date,
-    
+      type: Date,
     },
     created_date: {
-        type: Date,
-        required: true,
-        default: new Date()
-        
+      type: Date,
+      required: true,
+      default: new Date(),
     },
     address: {
-        type: String,
+      type: String,
     },
     profile_cover: {
-        type: Object,
-        
-    }
+      type: Object,
+    },
+  },
+  {
+    timestamps: true,
+  }
+);
 
-},{
-
-    timestamps:true,
-})
-
-const userModel= mongoose.models.User||model('User',userSchema);
+const userModel = mongoose.models.User || model("User", userSchema);
 export default userModel;

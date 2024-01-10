@@ -8,3 +8,4 @@ cloudinary.config({
 });
 export default cloudinary.v2;import {v2 as cloudinary} from 'cloudinary';
           
+//jokq fxzt cvma sleg
