@@ -1,21 +1,17 @@
-const express = require('express');
-const multer = require('multer');
-const admin = require('../DataBase/schema/admin');
-const community = require('../DataBase/schema/community');
-const communityproperties = require('../DataBase/schema/community_properities');
-const router = express.Router();
-var id = null;
+import community from "../../../db/modle/community.modle.js";
+import communityproperties from "../../../db/modle/CommunityProperties.modle.js";
 
-router.post("/createCommunity", async (req, res) => {
+export const createCommunity = async (req, res) => {
     // http://localhost:3000/community/createCommunity
     // {
     //     "communityName": "phones",
     //     "communityDescription": "for any phone you want"
     // }
     const { communityName, communityDescription } = req.body;
+    console.log("fff");
     const communityNameDB = await community.findOne({ community_name: communityName });
     if (communityNameDB) {
-        res.status(401).send({ msg: 'This community already exists' });
+        return res.status(401).send({ msg: 'This community already exists' });
     } else {
         const newCommunity = await community.create({
             community_name: communityName,
@@ -27,12 +23,11 @@ router.post("/createCommunity", async (req, res) => {
         }, {
             "_id": 1
         });
-        res.send("Community created successfully");
+        return res.send("Community created successfully");
     }
-});
+};
 
-router.post("/addProperty", async (req, res) => {
-    // http://localhost:3000/community/addProperty
+export const addProperty = async (req, res) => {
     // {
     //     "communityD": "phones" ,
     //     "propertyD": "12345",
@@ -45,7 +40,6 @@ router.post("/addProperty", async (req, res) => {
     if (propertyDB) {
         res.status(401).send({ msg: 'This this property already exists' });
     } else {
-
         const newProperty = await communityproperties.create({
             community_Name: communityD,
             property: propertyD,
@@ -59,8 +53,8 @@ router.post("/addProperty", async (req, res) => {
         console.log({ propertyD, valueD, ownerFillD, customerFillD });
         res.send("Community created successfully");
     }
-});
-router.post("/viewProperty", async (req, res) => {
+};
+export const viewProperty = async (req, res) => {
     // http://localhost:3000/community/viewProperty
     // {
     //     "communityD": "phones"
@@ -74,8 +68,9 @@ router.post("/viewProperty", async (req, res) => {
         .catch(err => {
             res.send("something error");
         });
-});
-router.post("/removeProperty", async (req, res) => {
+};
+
+export const removeProperty = async (req, res) => {
     // http://localhost:3000/community/removeProperty
     // {
     //     "communityD": "phones",
@@ -93,5 +88,4 @@ router.post("/removeProperty", async (req, res) => {
             return res.json("something error here!")
 
         });
-});
-module.exports = router;
+};
