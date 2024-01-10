@@ -4,12 +4,9 @@ import PostRouter from "./Post/post.router.js";
 import AuthRouter from "./Auth/atuh.router.js";
 import connectdb from "../../db/connection.js";
 import { sendemail } from "../services/email.js";
-import cors from 'cors'
 const initapp = async (app, express) => {
   const router = Router();
-
   app.use(express.json());
-  app.use(cors())
   // Connect to the database
   try {
     await connectdb();
