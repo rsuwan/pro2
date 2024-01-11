@@ -1,16 +1,16 @@
-// auth.controller.js
 import userModel from "../../../db/modle/User.modle.js";
 import logModel from "../../../db/log.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { sendemail } from "../../services/email.js";
+import { nanoid } from "nanoid";
+import { customAlphabet } from "nanoid";
 
 export const SignUp = async (req, res) => {
   const { firstName, lastName, email, password } = req.body;
 
   try {
     const user = await userModel.findOne({ email });
-
     if (user) {
       return res.status(409).json({ error: "Email already exists" });
     }
@@ -19,6 +19,13 @@ export const SignUp = async (req, res) => {
       password,
       parseInt(process.env.saltRounds)
     );
+    const token = jwt.sign({ email }, process.env.CONFIRMEMAILSECRET);
+
+    await sendemail(
+      email,
+      "Confirm Email",
+      `<a href='${req.protocol}://${req.headers.host}/auth/confirmEmail/${token}'>Verify</a>` // Corrected the template string
+    );
 
     const newUser = await userModel.create({
       firstName,
@@ -26,49 +33,67 @@ export const SignUp = async (req, res) => {
       email,
       password: hashedPassword,
     });
-    const token = jwt.sign({ email }, process.env.CONFIRMEMAILSECRET);
-    // Send confirmation email
-    try {
-      await sendemail(
-        email,
-        "Confirm Email",
-        `<a href='http://localhost:3000/auth/confirmEmail/${token}'>Verify</a>`
-      );
-    } catch (emailError) {
-      console.error("Error sending confirmation email:", emailError);
-      // Log the email sending error, but continue with the sign-up process
-    }
-
-    const userLog = await logModel.create({
-      email,
-      password: hashedPassword,
-      role: "user",
-    });
 
     return res.status(201).json({
-      message: "User created successfully",
-      userLog,
+      message:
+        "Your account has been successfully created! Please confirm your email address to start using the service.",
     });
   } catch (error) {
     console.error("Error in SignUp:", error);
-    return res.status(500).json({ error: "Internal Server Error" });
+    return res.status(500).json({ message: "Internal Server Error" });
   }
 };
 
-export const confirmEmail= async (req, res) => {
+export const confirmEmail = async (req, res) => {
+  const token = req.params.token;
+
   try {
-    const token = req.params.token;
-    const decoded = jwt.verify(token.process.env.CONFIRMEMAILSECRET);
+    const decoded = jwt.verify(token, process.env.CONFIRMEMAILSECRET);
+
     if (!decoded) {
       return res.status(404).json({ message: "Invalid Authorization" });
     }
-    const user=await userModel
-    return res.json({ token });
+
+    const user = await userModel.findOneAndUpdate(
+      { email: decoded.email, confirmEmail: false },
+      { confirmEmail: true }
+    );
+
+    if (!user) {
+      return res.status(400).json({
+        message: "Invalid: Email is already verified or does not exist",
+      });
+    }
+
+    return res.status(200).json({ message: "Your email is verified" });
   } catch (error) {
-    console.error("Error in ConfirmEmail:", error);
-    return res.status(500).json({ error: "Internal Server Error" });
+    console.error("Error in confirmEmail:", error);
+    return res.status(500).json({ message: "Internal Server Error" });
   }
 };
+
+export const sendCode = async (req, res) => {
+  const { email } = req.body;
+
+  try {
+    let code = customAlphabet("1234567890abcdefghijklmnopqrstuvwxyz", 4);
+    code = code();
+
+    const user = await userModel.findOneAndUpdate(
+      { email },
+      { sendCode: code },
+      { new: true }
+    );
+
+    await sendemail(email, "Reset Password", `<h2>Code is: ${code}</h2>`);
+
+    return res.status(200).json({ message: "Success", user });
+  } catch (error) {
+    console.error("Error in sendCode:", error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
 export const SignIn = async (req, res) => {
   const { email, password, role } = req.body;
 
@@ -97,6 +122,7 @@ export const SignIn = async (req, res) => {
       process.env.JWT_SECRET,
       { expiresIn: 60 * 60 * 24 * 30 }
     );
+
     return res.status(200).json({
       message: "User signed in successfully",
       token,

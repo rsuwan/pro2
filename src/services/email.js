@@ -1,7 +1,8 @@
 import nodemailer from "nodemailer";
+
 export async function sendemail(to, subject, html) {
   const transporter = nodemailer.createTransport({
-    service:'gmail',
+    service: 'gmail',
     auth: {
       user: process.env.EMAILSENDER,
       pass: process.env.EMAILPASSWORD,
@@ -9,10 +10,11 @@ export async function sendemail(to, subject, html) {
   });
 
   const info = await transporter.sendMail({
-    from: `"ABR "<${process.env.user}>`,
+    from: `ABR <${process.env.EMAILSENDER}>`, // Corrected the 'from' field
     to,
     subject,
     html,
   });
+
   return info;
 }
