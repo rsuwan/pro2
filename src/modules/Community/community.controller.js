@@ -1,5 +1,4 @@
 import community from "../../../db/modle/community.modle.js";
-<<<<<<< HEAD
 import communityproperties from "../../../db/modle/communityProperties.modle.js";
 export const viewCommunities = async (req, res) => {
     // http://localhost:3000/community/viewCommunities
@@ -40,7 +39,6 @@ export const createCommunity =  async (req, res) => {
     }
 
 };
-=======
 import communityproperties from "../../../db/modle/CommunityProperties.modle.js";
 
 export const createCommunity = async (req, res) => {
@@ -68,8 +66,6 @@ export const createCommunity = async (req, res) => {
         return res.send("Community created successfully");
     }
 };
-
->>>>>>> 55735e5d8e2a81963ce6e1047e9ed7891dc7d16d
 export const addProperty = async (req, res) => {
     // {
     //     "communityD": "phones" ,
