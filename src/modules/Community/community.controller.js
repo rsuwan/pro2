@@ -1,4 +1,5 @@
 import community from "../../../db/modle/community.modle.js";
+<<<<<<< HEAD
 import communityproperties from "../../../db/modle/communityProperties.modle.js";
 export const createCommunity =  async (req, res) => {
     // http://localhost:3000/community/createCommunity
@@ -27,6 +28,36 @@ export const createCommunity =  async (req, res) => {
     }
 
 };
+=======
+import communityproperties from "../../../db/modle/CommunityProperties.modle.js";
+
+export const createCommunity = async (req, res) => {
+    // http://localhost:3000/community/createCommunity
+    // {
+    //     "communityName": "phones",
+    //     "communityDescription": "for any phone you want"
+    // }
+    const { communityName, communityDescription } = req.body;
+    console.log("fff");
+    const communityNameDB = await community.findOne({ community_name: communityName });
+    if (communityNameDB) {
+        return res.status(401).send({ msg: 'This community already exists' });
+    } else {
+        const newCommunity = await community.create({
+            community_name: communityName,
+            description: communityDescription,
+        });
+        newCommunity.save();
+        const { _id } = await community.findOne({
+            "community_name": communityName
+        }, {
+            "_id": 1
+        });
+        return res.send("Community created successfully");
+    }
+};
+
+>>>>>>> 55735e5d8e2a81963ce6e1047e9ed7891dc7d16d
 export const addProperty = async (req, res) => {
     // {
     //     "communityD": "phones" ,
@@ -51,7 +82,11 @@ export const addProperty = async (req, res) => {
         newProperty.save();
 
         console.log({ propertyD, valueD, ownerFillD, customerFillD });
+<<<<<<< HEAD
         res.send("Property created successfully");
+=======
+        res.send("Community created successfully");
+>>>>>>> 55735e5d8e2a81963ce6e1047e9ed7891dc7d16d
     }
 };
 export const viewProperty = async (req, res) => {
@@ -69,6 +104,7 @@ export const viewProperty = async (req, res) => {
             res.send("something error");
         });
 };
+<<<<<<< HEAD
 export const removeProperty = async (req, res) => {
     const { communityD, propertyD } = req.body;
 
@@ -84,4 +120,25 @@ export const removeProperty = async (req, res) => {
         console.error(err);
         return res.status(500).json({ error: "Internal Server Error" });
     }
+=======
+
+export const removeProperty = async (req, res) => {
+    // http://localhost:3000/community/removeProperty
+    // {
+    //     "communityD": "phones",
+    //     "propertyD": "123"
+    // }
+    const { communityD, propertyD } = req.body;
+
+    communityproperties.deleteOne({ "community_Name": communityD ,  "property": propertyD })
+        .then(result => {
+            return res.json(result)
+        }
+        )
+        .catch(err => {
+            console.error(err);
+            return res.json("something error here!")
+
+        });
+>>>>>>> 55735e5d8e2a81963ce6e1047e9ed7891dc7d16d
 };

@@ -12,6 +12,7 @@ const communitySchema = new Schema({
         type: String,
         required: true,
     },
+<<<<<<< HEAD
     creater_email: {
         type: String,
         // required: true
@@ -26,6 +27,15 @@ const communitySchema = new Schema({
     },
 
 },{
+=======
+    created_by: {
+        type: Types.ObjectId,ref:'Admin'
+    },
+    cover_image: {
+        type: Object,
+
+    },{
+>>>>>>> 55735e5d8e2a81963ce6e1047e9ed7891dc7d16d
 
     timestamps:true,
 })
