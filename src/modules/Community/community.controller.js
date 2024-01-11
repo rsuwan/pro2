@@ -1,6 +1,18 @@
 import community from "../../../db/modle/community.modle.js";
 <<<<<<< HEAD
 import communityproperties from "../../../db/modle/communityProperties.modle.js";
+export const viewCommunities = async (req, res) => {
+    // http://localhost:3000/community/viewCommunities
+
+    community.find({}, { community_name: 1, description: 1, _id: 0 })
+        .then(communityD => {
+            res.send(communityD);
+        })
+        .catch(err => {
+            res.send("something error");
+        });
+};
+
 export const createCommunity =  async (req, res) => {
     // http://localhost:3000/community/createCommunity
     // {
