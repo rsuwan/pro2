@@ -1,4 +1,4 @@
-import admin from '../../../db/modle/Admin.modle.js'
+import admin from '../../../db/modle/admin.modle.js'
 import  communities from '../../../db/modle/community.modle.js'
 import  log from '../../../db/log.js'
 import { Router } from "express";
