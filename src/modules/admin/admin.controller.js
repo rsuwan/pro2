@@ -12,39 +12,32 @@ export const community = async (req, res) => {
     });
 };
 export const addAdmin = async (req, res) => {
-  const {
-    first_name,
-    last_name,
-    email,
-    password,
-    adminAt,
-    degree,
-    bithday,
-    address,
-  } = req.body;
-
-  const findAdmin = await log.findOne({ email: email }, { _id: 1 });
+  const { first_name, last_name, email, password, adminAt, degree, bithday, address } = req.body;
+  console.log( { first_name, last_name, email, password, adminAt, degree, bithday, address });
+  const findAdmin = await log.findOne({ "email": email }, { "_id": 1 })
   if (findAdmin) {
-    return res.status(401).send({ msg: "this admin is already exists" });
+      return res.status(401).send({ msg: 'this admin is already exists' });
   } else {
-    const newAdmin = await admin.create({
-      email: email,
-      first_name: first_name,
-      last_name: last_name,
-      address: address,
-      community_id: adminAt,
-      birth_date: bithday,
-    });
-    newAdmin.save();
-    const newAdminLog = await log.create({
-      email: email,
-      role: degree,
-      password: password,
-    });
-    newAdminLog.save();
-    return res.send({ msg: "admin created" });
+      const newAdmin = await admin.create({
+          "email": email,
+          "first_name": first_name,
+          "last_name": last_name,
+          "address": address,
+          "community_id": adminAt,
+          "birth_date": bithday,
+      });
+      newAdmin.save();
+      console.log("sss");
+      const newAdminLog = await log.create({
+          "email": email,
+          "role": degree,
+          "password": password,
+      });
+      console.log("ddd");
+      newAdminLog.save();
+      return res.send({ msg: 'admin created' });
   }
-};
+}
 
 export const deleteAdmin = async (req, res) => {
   const { emailA } = req.body;
@@ -72,7 +65,7 @@ export const viewAdmin = async (req, res) => {
 export const disableAccount = async (req, res) => {
   const { email } = req.body;
   log
-    .findOneAndUpdate({ email: email }, { status: false })
+    .updateOne({ email: email }, { status: false })
     .then((eresult) => {
       return res.send("This account is disabled");
     })

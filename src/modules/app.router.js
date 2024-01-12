@@ -17,7 +17,6 @@ const initapp = async (app, express) => {
     console.error(error);
     process.exit(1);
   }
-
   // Set up the routes
   app.get("/", (req, res) => {
     return res.status(200).json({ message: "Welcome" });

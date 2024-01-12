@@ -7,6 +7,8 @@ const communitySchema = new Schema({
     community_name: {
         type: String,
         required: true,
+        unique: true,
+
     },
     description: {
         type: String,
