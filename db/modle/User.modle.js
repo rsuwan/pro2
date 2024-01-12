@@ -54,10 +54,10 @@ const userSchema = new Schema(
     },
     address: {
       type: String,
-    }, 
-    sendCode:{
-      type: String, 
-      default:null,
+    },
+    sendCode: {
+      type: String,
+      default: null,
     },
     profile_cover: {
       type: Object,

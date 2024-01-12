@@ -2,8 +2,6 @@ import community from "../../../db/modle/community.modle.js";
 import communityproperties from "../../../db/modle/communityProperties.modle.js";
 
 export const viewCommunities = async (req, res) => {
-  // http://localhost:3000/community/viewCommunities
-
   community
     .find({}, { community_name: 1, description: 1, _id: 0 })
     .then((communityD) => {
@@ -15,13 +13,7 @@ export const viewCommunities = async (req, res) => {
 };
 
 export const createCommunity = async (req, res) => {
-  // http://localhost:3000/community/createCommunity
-  // {
-  //     "communityName": "phones",
-  //     "communityDescription": "for any phone you want"
-  // }
   const { communityName, communityDescription } = req.body;
-  console.log("fff");
   const communityNameDB = await community.findOne({
     community_name: communityName,
   });
@@ -33,55 +25,33 @@ export const createCommunity = async (req, res) => {
       description: communityDescription,
     });
     newCommunity.save();
-    const { _id } = await community.findOne(
-      {
-        community_name: communityName,
-      },
-      {
-        _id: 1,
-      }
-    );
     return res.send("Community created successfully");
   }
 };
 
 export const addProperty = async (req, res) => {
-  // {
-  //     "communityD": "phones" ,
-  //     "propertyD": "12345",
-  //     "valueD": "String",
-  //     "ownerFillD": true,
-  //     "customerFillD": false
-  // }
-  const { communityD, propertyD, valueD, ownerFillD, customerFillD } = req.body;
+  const { communityName, propertyD, ownerFillD, customerFillD, valueD } =
+    req.body;
   const propertyDB = await communityproperties.findOne({ property: propertyD });
   if (propertyDB) {
     res.status(401).send({ msg: "This this property already exists" });
   } else {
     const newProperty = await communityproperties.create({
-      community_Name: communityD,
+      community_Name: communityName,
       property: propertyD,
       value: valueD,
       owner_fill: ownerFillD,
       customer_fill: customerFillD,
     });
-    console.log("ll");
     newProperty.save();
-
     console.log({ propertyD, valueD, ownerFillD, customerFillD });
-    res.send("Property created successfully");
-
-    res.send("Community created successfully");
+    res.send("added successfuly");
   }
 };
 export const viewProperty = async (req, res) => {
-  // http://localhost:3000/community/viewProperty
-  // {
-  //     "communityD": "phones"
-  // }
-  const { communityD } = req.body;
+  const { communityName } = req.body;
   communityproperties
-    .find({ community_Name: communityD }, { _id: 0, __v: 0 })
+    .find({ community_Name: communityName }, { __v: 0 })
     .then((propertiesD) => {
       res.send(propertiesD);
     })
@@ -91,17 +61,30 @@ export const viewProperty = async (req, res) => {
 };
 
 export const removeProperty = async (req, res) => {
-  // http://localhost:3000/community/removeProperty
-  // {
-  //     "communityD": "phones",
-  //     "propertyD": "123"
-  // }
-  const { communityD, propertyD } = req.body;
-
+  const { communityName, propertyD } = req.body;
   communityproperties
-    .deleteOne({ community_Name: communityD, property: propertyD })
+    .deleteOne({ community_Name: communityName, property: propertyD })
     .then((result) => {
       return res.json(result);
+    })
+    .catch((err) => {
+      console.error(err);
+      return res.json("something error here!");
+    });
+};
+export const cancleCreation = async (req, res) => {
+  const { communityName } = req.body;
+  communityproperties
+    .deleteMany({ community_Name: communityName })
+    .then((result) => {})
+    .catch((err) => {
+      console.error(err);
+      return res.json("something error here!");
+    });
+  community
+    .deleteOne({ community_name: communityName })
+    .then((result) => {
+      return res.json({ msg: "deleting done" });
     })
     .catch((err) => {
       console.error(err);

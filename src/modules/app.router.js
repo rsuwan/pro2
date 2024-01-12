@@ -3,7 +3,7 @@ import CommunityRouter from "./Community/Community.router.js";
 import PostRouter from "./Post/post.router.js";
 import AuthRouter from "./Auth/atuh.router.js";
 import connectdb from "../../db/connection.js";
-
+import AdminRouter from "./admin/admin.router.js";
 const initapp = async (app, express) => {
   const router = Router();
 
@@ -26,7 +26,7 @@ const initapp = async (app, express) => {
   app.use("/auth", AuthRouter);
   app.use("/post", PostRouter);
   app.use("/community", CommunityRouter);
-
+  app.use("/admins", AdminRouter);
   app.get("*", (req, res) => {
     return res.status(404).json({ message: "Page not found" });
   });
