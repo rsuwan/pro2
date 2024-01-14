@@ -8,7 +8,7 @@ const userSchema = new Schema(
       trim: true,
       lowercase: true,
       match: [
-        /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
+        /^\w+([\.-]?\w+)@\w+([\.-]?\w+)(\.\w{2,3})+$/,
         "Please enter a valid email address",
       ],
     },
@@ -36,11 +36,6 @@ const userSchema = new Schema(
     bio: {
       type: String,
     },
-    state_us: {
-      type: String,
-      default: "Active",
-      enum: ["Active", "InActive"],
-    },
     admin_email: {
       type: String,
     },
@@ -54,10 +49,10 @@ const userSchema = new Schema(
     },
     address: {
       type: String,
-    },
-    sendCode: {
-      type: String,
-      default: null,
+    }, 
+    sendCode:{
+      type: String, 
+      default:null,
     },
     profile_cover: {
       type: Object,

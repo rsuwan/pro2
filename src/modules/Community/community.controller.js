@@ -1,9 +1,8 @@
 import community from "../../../db/modle/community.modle.js";
 import communityproperties from "../../../db/modle/communityProperties.modle.js";
-
 export const viewCommunities = async (req, res) => {
-  community
-    .find({}, { community_name: 1, description: 1, _id: 0 })
+  community.find({},
+    { community_name: 1, description: 1, _id: 0 })
     .then((communityD) => {
       res.send(communityD);
     })
@@ -30,14 +29,18 @@ export const createCommunity = async (req, res) => {
 };
 
 export const addProperty = async (req, res) => {
-  const { communityName, propertyD, ownerFillD, customerFillD, valueD } =
-    req.body;
-  const propertyDB = await communityproperties.findOne({ property: propertyD });
+  const { propertyD, ownerFillD, customerFillD, valueD } = req.body;
+  const latestCommunity = await community.findOne({}, { community_name: 1, created_date: 1, _id: 0 })
+    .sort({ createdAt: -1 })
+    .exec();
+  console.log(latestCommunity);
+  console.log(latestCommunity.community_name);
+  const propertyDB = await communityproperties.findOne({ $and: [{ property: propertyD }, { community_Name: latestCommunity }] })
   if (propertyDB) {
     res.status(401).send({ msg: "This this property already exists" });
   } else {
     const newProperty = await communityproperties.create({
-      community_Name: communityName,
+      community_Name: latestCommunity.community_name,
       property: propertyD,
       value: valueD,
       owner_fill: ownerFillD,
@@ -48,6 +51,7 @@ export const addProperty = async (req, res) => {
     res.send("added successfuly");
   }
 };
+
 export const viewProperty = async (req, res) => {
   const { communityName } = req.body;
   communityproperties
@@ -72,11 +76,12 @@ export const removeProperty = async (req, res) => {
       return res.json("something error here!");
     });
 };
+
 export const cancleCreation = async (req, res) => {
   const { communityName } = req.body;
-  communityproperties
-    .deleteMany({ community_Name: communityName })
-    .then((result) => {})
+  communityproperties.deleteMany({ community_Name: communityName })
+    .then((result) => {
+    })
     .catch((err) => {
       console.error(err);
       return res.json("something error here!");
@@ -85,8 +90,7 @@ export const cancleCreation = async (req, res) => {
     .deleteOne({ community_name: communityName })
     .then((result) => {
       return res.json({ msg: "deleting done" });
-    })
-    .catch((err) => {
+    }).catch((err) => {
       console.error(err);
       return res.json("something error here!");
     });

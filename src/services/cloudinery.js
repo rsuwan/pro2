@@ -6,6 +6,5 @@ cloudinary.config({
   api_key: process.env.api_key, 
   api_secret: process.env.api_secret
 });
-export default cloudinary.v2;import {v2 as cloudinary} from 'cloudinary';
-          
+export default cloudinary.v2;
 //jokq fxzt cvma sleg
