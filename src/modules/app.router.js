@@ -1,6 +1,5 @@
 import { Router } from "express";
 import CommunityRouter from "./Community/Community.router.js";
-import CommunitysRouter from "./communitys/communitys.router.js";
 import PostRouter from "./Post/post.router.js";
 import AuthRouter from "./Auth/atuh.router.js";
 import connectdb from "../../db/connection.js";
@@ -25,7 +24,6 @@ const initapp = async (app, express) => {
   });
 
   app.use("/auth", AuthRouter);
-  app.use("/communitys", CommunitysRouter);
  app.use("/community", CommunityRouter);
   app.use("/admins", AdminRouter);
   app.use("/user", UserRouter);
