@@ -1,4 +1,4 @@
-import 'dotenv/config'
+import 'dotenv/config';
 import  cloudinary from 'cloudinary';
           
 cloudinary.config({ 
@@ -7,4 +7,3 @@ cloudinary.config({
   api_secret: process.env.api_secret
 });
 export default cloudinary.v2;
-//jokq fxzt cvma sleg

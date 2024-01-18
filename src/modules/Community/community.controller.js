@@ -1,8 +1,11 @@
+import slugify from "slugify";
+import cloudinary from "../../services/cloudinary.js";
 import community from "../../../db/modle/community.modle.js";
 import communityproperties from "../../../db/modle/communityProperties.modle.js";
+
 export const viewCommunities = async (req, res) => {
-  community.find({},
-    { community_name: 1, description: 1, _id: 0 })
+  community
+    .find({}, { community_name: 1, description: 1, _id: 0 })
     .then((communityD) => {
       res.send(communityD);
     })
@@ -11,31 +14,151 @@ export const viewCommunities = async (req, res) => {
     });
 };
 
-export const createCommunity = async (req, res) => {
-  const { communityName, communityDescription } = req.body;
-  const communityNameDB = await community.findOne({
-    community_name: communityName,
-  });
-  if (communityNameDB) {
-    return res.status(401).send({ msg: "This community already exists" });
-  } else {
-    const newCommunity = await community.create({
-      community_name: communityName,
-      description: communityDescription,
-    });
-    newCommunity.save();
-    return res.send("Community created successfully");
+export const getCommunities = async (req, res) => {
+  try {
+    const communities = await community.find(); //.select('community_name'); اختار ايش اعرض
+    return res.status(200).json({ message: "success", communities });
+  } catch (error) {
+    console.error("Error:", error);
+    return res.status(500).json({ message: "Internal Server Error" });
   }
 };
 
+export const getSpecificCommunity = async (req, res) => {
+  const { id } = req.params;
+  const Community = await community.findById(id);
+  return res.status(200).json({ message: "success", Community });
+};
+
+export const createCommunity = async (req, res) => {
+  try {
+    // التحقق من وجود ملف في الطلب
+    if (!req.file) {
+      return res.status(400).json({ message: "Please upload a file" });
+    }
+
+    // التحقق من وجود البيانات اللازمة في req.body
+    const { community_name, description } = req.body;
+    if (!community_name || !description) {
+      return res
+        .status(400)
+        .json({ message: "Please provide community_name and description" });
+    }
+
+    const lowerCaseCommunityName = community_name.toLowerCase();
+
+    // التحقق من عدم وجود اسم المجتمع في قاعدة البيانات
+    const existingCommunity = await community.findOne({ community_name });
+    if (existingCommunity) {
+      return res.status(409).json({ message: "Community name already exists" });
+    }
+
+    // رفع الصورة إلى Cloudinary
+    const { secure_url, public_id } = await cloudinary.uploader.upload(
+      req.file.path,
+      {
+        folder: `${process.env.APP_NAME}/communities`,
+      }
+    );
+
+    // إنشاء Slug
+    const slugname = slugify(lowerCaseCommunityName);
+
+    // إنشاء مجتمع جديد
+    const newCommunity = await community.create({
+      community_name,
+      slug: slugname,
+      image: { secure_url, public_id },
+      description,
+    });
+
+    return res
+      .status(201)
+      .json({ message: "Community created successfully", newCommunity });
+  } catch (error) {
+    console.error("Error:", error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+export const updateCommunity = async (req, res) => {
+  const Community = await community.findById(req.params.id);
+
+  // return res .json(Community);
+  try {
+    const Community = await community.findById(req.params.id);
+
+    if (!Community) {
+      return res
+        .status(404)
+        .json({ message: `Community not found with id: ${req.params.id}` });
+    }
+
+    if (req.body.community_name) {
+      if (
+        await community
+          .findOne({ community_name: req.body.community_name })
+          .select("community_name")
+      ) {
+        return res.status(409).json({
+          message: `Community ${req.body.community_name} name already exists`,
+        });
+      }
+
+      Community.community_name = req.body.community_name;
+      Community.slug = slugify(req.body.community_name);
+    }
+
+    if (req.body.status) {
+      Community.status = req.body.status;
+    }
+
+    if (req.body.description) {
+      Community.description = req.body.description;
+    }
+
+    if (req.file) {
+      const { secure_url, public_id } = await cloudinary.uploader.upload(
+        req.file.path,
+        { folder: `${process.env.APP_NAME}/Communities` }
+      );
+      await cloudinary.uploader.destroy(Community.image.public_id);
+      Community.image = { secure_url, public_id };
+    }
+    await Community.save();
+
+    return res
+      .status(200)
+      .json({ message: "Community updated successfully", Community });
+  } catch (error) {
+    console.error("Error:", error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+export const getActiveCommunities = async (req, res) => {
+  try {
+    const communities = await Community.find({ status: "Active" }).select(
+      "community_name image description"
+    );
+    return res.status(200).json({ message: "success", communities });
+  } catch (err) {
+    console.error(err); // Log the error for debugging purposes
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 export const addProperty = async (req, res) => {
   const { propertyD, ownerFillD, customerFillD, valueD } = req.body;
-  const latestCommunity = await community.findOne({}, { community_name: 1, created_date: 1, _id: 0 })
+  const latestCommunity = await community
+    .findOne({}, { community_name: 1, created_date: 1, _id: 0 })
     .sort({ createdAt: -1 })
     .exec();
   console.log(latestCommunity);
   console.log(latestCommunity.community_name);
-  const propertyDB = await communityproperties.findOne({ $and: [{ property: propertyD }, { community_Name: latestCommunity }] })
+  const propertyDB = await communityproperties.findOne({
+    $and: [{ property: propertyD }, { community_Name: latestCommunity }],
+  });
   if (propertyDB) {
     res.status(401).send({ msg: "This this property already exists" });
   } else {
@@ -49,6 +172,62 @@ export const addProperty = async (req, res) => {
     newProperty.save();
     console.log({ propertyD, valueD, ownerFillD, customerFillD });
     res.send("added successfuly");
+  }
+};
+
+export const updateProperty = async (req, res) => {
+  try {
+    const propertyId = req.params.id;
+    const updatedFields = req.body;
+
+    // التحقق من وجود الخاصية
+    const propertyInstance = await communityproperties.findById(propertyId);
+    if (!propertyInstance) {
+      return res
+        .status(404)
+        .json({ message: `Property not found with id: ${propertyId}` });
+    }
+
+    // التحقق من وجود اسم الخاصية المحدثة
+    if (updatedFields.propertyD) {
+      const existingProperty = await communityproperties.findOne({
+        propertyD: updatedFields.propertyD,
+      });
+      if (existingProperty && existingProperty._id.toString() !== propertyId) {
+        return res.status(409).json({
+          message: `Property ${updatedFields.propertyD} name already exists`,
+        });
+      }
+      propertyInstance.propertyD = updatedFields.propertyD;
+    }
+
+    // التحقق من وجود القيمة المحدثة
+    if (updatedFields.valueD) {
+      propertyInstance.valueD = updatedFields.valueD;
+    }
+
+    // التحقق من وجود العميل المحدث
+    if (updatedFields.customerFillD) {
+      propertyInstance.customerFillD = updatedFields.customerFillD;
+    }
+
+    // التحقق من وجود المالك المحدث
+    if (updatedFields.ownerFillD) {
+      propertyInstance.ownerFillD = updatedFields.ownerFillD;
+    }
+
+    // حفظ التغييرات
+    await propertyInstance.save();
+
+    return res
+      .status(200)
+      .json({
+        message: "Property updated successfully",
+        property: propertyInstance,
+      });
+  } catch (error) {
+    console.error("Error:", error);
+    return res.status(500).json({ message: "Internal Server Error" });
   }
 };
 
@@ -79,9 +258,9 @@ export const removeProperty = async (req, res) => {
 
 export const cancleCreation = async (req, res) => {
   const { communityName } = req.body;
-  communityproperties.deleteMany({ community_Name: communityName })
-    .then((result) => {
-    })
+  communityproperties
+    .deleteMany({ community_Name: communityName })
+    .then((result) => {})
     .catch((err) => {
       console.error(err);
       return res.json("something error here!");
@@ -90,7 +269,8 @@ export const cancleCreation = async (req, res) => {
     .deleteOne({ community_name: communityName })
     .then((result) => {
       return res.json({ msg: "deleting done" });
-    }).catch((err) => {
+    })
+    .catch((err) => {
       console.error(err);
       return res.json("something error here!");
     });

@@ -2,6 +2,13 @@ import { Router } from "express";
 import * as postcontroller from './post.controller.js';
 const router = Router();
 
-router.get("/", postcontroller.getpost);
-
+router.get("/:community/postView", postcontroller.postView);
+router.post("/:community/createPost", postcontroller.createPost);
+router.get("/:community/viewPost", postcontroller.viewPost);
+// router.post("/:community/createPost", fileUpload(fileValidation.image).fields([
+//     {name:'mainImage',maxCount:1},
+//     {name:'supImages',maxCount:30},
+    
+//     ]),postcontroller.createPost);
+// router.post("/:community/likePost", postcontroller.likePost);
 export default router;

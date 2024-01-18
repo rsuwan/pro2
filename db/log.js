@@ -7,7 +7,7 @@ const logSchema =  new Schema({
     },
     role: {
         type: String,
-        enum: ['superadmin', 'admin', 'user'],
+        enum: ['SuperAdmin', 'Admin', 'user'],
         required: true
     },
     state_us: {

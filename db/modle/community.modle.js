@@ -1,37 +1,34 @@
 // community.modle.js
-import mongoose from "mongoose";
-
-const { Schema } = mongoose;
-
+import mongoose, { Schema, Types } from "mongoose";
 const communitySchema = new Schema({
     community_name: {
         type: String,
         required: true,
         unique: true,
-
+    },
+    slug: {
+        type: String,
+        required: true,
     },
     description: {
         type: String,
         required: true,
     },
-    creater_email: {
-        type: String,
-        // required: true
-    },
-    created_date: {
-        type: Date,
-        required: true,
-        default: new Date(),
-    },
-    cover_image: {
+    image: {
         type: Object,
+        required: true,
     },
-
-   
+    status: {
+        type: String,
+        default: 'Active',
+        enum: ['Active', 'InActive'],
+    },
+    createdBy: { type: Types.ObjectId, ref: 'SuperAdmin' },
+    updatedBy: { type: Types.ObjectId, ref: 'SuperAdmin' },
 },
     {
-      timestamps: true,
+        timestamps: true,
     }
-  );
+);
 const Community = mongoose.model("Community", communitySchema);
 export default Community;

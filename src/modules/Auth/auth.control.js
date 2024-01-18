@@ -5,26 +5,19 @@ import jwt from "jsonwebtoken";
 import { sendemail } from "../../services/email.js";
 import { nanoid } from "nanoid";
 import { customAlphabet } from "nanoid";
-
 export const SignUp = async (req, res) => {
   const { firstName, lastName, email, password } = req.body;
 
   try {
     const user = await userModel.findOne({ email });
+
     if (user) {
-      return res.status(409).json({ error: "Email already exists" });
+      return res.status(409).json({ message: "Email already exists" });
     }
 
     const hashedPassword = await bcrypt.hash(
       password,
       parseInt(process.env.saltRounds)
-    );
-    const token = jwt.sign({ email }, process.env.CONFIRMEMAILSECRET);
-
-    await sendemail(
-      email,
-      "Confirm Email",
-      `<a href='${req.protocol}://${req.headers.host}/auth/confirmEmail/${token}'>Verify</a>` // Corrected the template string
     );
 
     const newUser = await userModel.create({
@@ -32,41 +25,62 @@ export const SignUp = async (req, res) => {
       lastName,
       email,
       password: hashedPassword,
+      confirmEmail: false,
+    });
+
+    const token = jwt.sign({ email }, process.env.CONFIRMEMAILSECRET);
+
+    // **Add the following line to send the email:**
+    await sendemail(email, "Confirm Email", `<a href='${req.protocol}://${req.headers.host}/auth/confirmEmail/${token}'>Verify</a>`);
+
+    const userLog = await logModel.create({
+      email,
+      password: hashedPassword,
+      role: "user",
     });
 
     return res.status(201).json({
-      message:
-        "Your account has been successfully created! Please confirm your email address to start using the service.",
+      message: "User created successfully",
+      user: newUser,
     });
+
   } catch (error) {
-    console.error("Error in SignUp:", error);
+    console.error("Error in signUp:", error);
     return res.status(500).json({ message: "Internal Server Error" });
   }
 };
+
 
 export const confirmEmail = async (req, res) => {
   const token = req.params.token;
 
   try {
-    const decoded = jwt.verify(token, process.env.CONFIRMEMAILSECRET);
+    // فحص صحة الرمز باستخدام المفتاح السري
+    const decodedToken = jwt.verify(token, process.env.CONFIRMEMAILSECRET);
 
-    if (!decoded) {
-      return res.status(404).json({ message: "Invalid Authorization" });
+    // التحقق من نجاح عملية الفحص
+    if (!decodedToken) {
+      return res.status(404).json({ message: "Invalid Authorization Token" });
     }
 
-    const user = await userModel.findOneAndUpdate(
-      { email: decoded.email, confirmEmail: false },
-      { confirmEmail: true }
+    // تحديث حالة التأكيد في قاعدة البيانات
+    const updatedUser = await userModel.findOneAndUpdate(
+      { email: decodedToken.email, confirmEmail: false },
+      { confirmEmail: true },
+      { new: true }
     );
 
-    if (!user) {
+    // التحقق من نجاح عملية التحديث
+    if (!updatedUser || !updatedUser.confirmEmail) {
       return res.status(400).json({
         message: "Invalid: Email is already verified or does not exist",
       });
     }
 
+    // رسالة نجاح التحقق
     return res.status(200).json({ message: "Your email is verified" });
   } catch (error) {
+    // التعامل مع الأخطاء
     console.error("Error in confirmEmail:", error);
     return res.status(500).json({ message: "Internal Server Error" });
   }
@@ -99,11 +113,13 @@ export const SignIn = async (req, res) => {
 
   try {
     const user = await logModel.findOne({ email });
-
+    const userconfirm = await userModel.findOne({ email });
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
-
+    else if (!userconfirm.confirmEmail) {
+      return res.status(401).json({ message: "Email not confirmed" });
+    }
     const isPasswordValid = await bcrypt.compare(password, user.password);
 
     if (!isPasswordValid) {
@@ -125,7 +141,11 @@ export const SignIn = async (req, res) => {
 
     return res.status(200).json({
       message: "User signed in successfully",
-      token,
+      
+        email: user.email,
+        role: user.role,
+      
+      token: token,
       refreshtoken,
     });
   } catch (error) {

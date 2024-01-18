@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { SignUp, SignIn ,confirmEmail} from './auth.js';
+import { SignUp, SignIn ,confirmEmail} from './auth.control.js';
 
 const router = Router();
 router.post('/signup', SignUp);
