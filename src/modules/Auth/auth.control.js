@@ -17,7 +17,7 @@ export const SignUp = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(
       password,
-      parseInt(process.env.saltRounds)
+      parseInt(process.env.SALT_ROUND)
     );
 
     const newUser = await userModel.create({
@@ -25,31 +25,33 @@ export const SignUp = async (req, res) => {
       lastName,
       email,
       password: hashedPassword,
-      confirmEmail: false,
+      // confirmEmail: false,
     });
 
     const token = jwt.sign({ email }, process.env.CONFIRMEMAILSECRET);
 
-    // **Add the following line to send the email:**
-    await sendemail(email, "Confirm Email", `<a href='${req.protocol}://${req.headers.host}/auth/confirmEmail/${token}'>Verify</a>`);
-
     const userLog = await logModel.create({
       email,
       password: hashedPassword,
-      role: "user",
+      // role: "User",
     });
+    await sendemail(
+      email,
+      "Confirm Email",
+      `<a href='${req.protocol}://${req.headers.host}/auth/confirmEmail/${token}'>Verify</a>`
+    );
 
     return res.status(201).json({
       message: "User created successfully",
       user: newUser,
     });
-
   } catch (error) {
-    console.error("Error in signUp:", error);
-    return res.status(500).json({ message: "Internal Server Error" });
+    console.error("Error in signUp:", error); // سجّل الخطأ هنا
+    return res
+      .status(500)
+      .json({ message: "Internal Server Error", error: error.message });
   }
 };
-
 
 export const confirmEmail = async (req, res) => {
   const token = req.params.token;
@@ -116,8 +118,7 @@ export const SignIn = async (req, res) => {
     const userconfirm = await userModel.findOne({ email });
     if (!user) {
       return res.status(404).json({ message: "User not found" });
-    }
-    else if (!userconfirm.confirmEmail) {
+    } else if (!userconfirm.confirmEmail) {
       return res.status(401).json({ message: "Email not confirmed" });
     }
     const isPasswordValid = await bcrypt.compare(password, user.password);
@@ -129,22 +130,19 @@ export const SignIn = async (req, res) => {
     }
 
     const token = jwt.sign(
-      { email: user.email, role: user.role },
+      { id: user._id, role: user.role, state_us: user.state_us },
       process.env.JWT_SECRET,
       { expiresIn: "30m" }
     );
     const refreshtoken = jwt.sign(
-      { email: user.email, role: user.role },
+      { id: user._id, role: user.role, state_us: userconfirm.state_us },
       process.env.JWT_SECRET,
       { expiresIn: 60 * 60 * 24 * 30 }
     );
 
     return res.status(200).json({
       message: "User signed in successfully",
-      
-        email: user.email,
-        role: user.role,
-      
+      role: user.role,
       token: token,
       refreshtoken,
     });

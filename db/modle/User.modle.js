@@ -1,17 +1,23 @@
 import mongoose, { Schema, model } from "mongoose";
 const userSchema = new Schema(
   {
-
+    firstName: {
+      type: String,
+      required: [true, "First name is required"],
+      trim: true,
+      min: 2,
+      max: 50,
+      match: [/^[A-Za-z]+$/, "First name should contain only letters"],
+    },
     lastName: {
       type: String,
       required: [true, "Last name is required"],
       trim: true,
       min: 2,
       max: 50,
+      match: [/^[A-Za-z]+$/, "last name should contain only letters"],
     },
-    phone: {
-      type: String,
-    },
+
     email: {
       type: String,
       required: true,
@@ -21,21 +27,17 @@ const userSchema = new Schema(
           // Update the regular expression based on your requirements
           return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
         },
-        message: 'Please enter a valid email address',
+        message: "Please enter a valid email address",
       },
     },
+
     confirmEmail: {
       type: Boolean,
       default: false,
     },
-    firstName: {
+    phone: {
       type: String,
-      required: [true, "First name is required"],
-      trim: true,
-      min: 2,
-      max: 50,
     },
-
     bio: {
       type: String,
     },

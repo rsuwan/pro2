@@ -3,12 +3,12 @@ import mongoose,{Schema, model} from 'mongoose'
 const logSchema =  new Schema({
     email: {
         type: String,
-        required: true
+      required: [true, "Email is required"],
     },
     role: {
         type: String,
-        enum: ['SuperAdmin', 'Admin', 'user'],
-        required: true
+        default:'User',
+        enum: ['SuperAdmin', 'Admin', 'User'],
     },
     state_us: {
         type: Boolean,
@@ -16,7 +16,7 @@ const logSchema =  new Schema({
     },
     password: {
         type: String,
-        required: true
+      required: [true, "Password is required"],
     }
 });
 const logModel= mongoose.models.Log||model('Log',logSchema);

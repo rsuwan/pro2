@@ -13,7 +13,7 @@ export const addUser = async (req, res) => {
             });
             newUser.save();
             const newUserLog = await log.create({
-                email, role: 'user', password
+                email, role: 'User', password
             });
             newUserLog.save();
             return res.status(201).send({ msg: 'user created' });
