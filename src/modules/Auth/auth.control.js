@@ -115,6 +115,7 @@ export const SignIn = async (req, res) => {
     // if (role === 'SuperAdmin' && !user.confirmEmail) {
     //   return res.status(401).json({ message: "Email not confirmed for SuperAdmin" });
     // }
+
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     } 
