@@ -117,7 +117,8 @@ export const SignIn = async (req, res) => {
     // }
     if (!user) {
       return res.status(404).json({ message: "User not found" });
-    } else if (role === "User" && !userconfirm.confirmEmail) {
+    } 
+    else if (!userconfirm.confirmEmail) {
       return res.status(401).json({ message: "Email not confirmed" });
     }
     const isPasswordValid = await bcrypt.compare(password, user.password);
