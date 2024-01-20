@@ -22,7 +22,12 @@ export const addUser = async (req, res) => {
         return res.status(401).send({ msg: 'unfilled fields' });
     }
 };
-
+export const deleteuser = async (req, res) => {
+    const {id}= req.params;
+    const user = await user.destroy({
+        where:{id}
+    });
+};
 export const deleteUser = async (req, res) => {
     const { email } = req.body;
     if (email != undefined) {

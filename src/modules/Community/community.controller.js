@@ -2,7 +2,6 @@ import slugify from "slugify";
 import cloudinary from "../../services/cloudinary.js";
 import community from "../../../db/modle/community.modle.js";
 import communityproperties from "../../../db/modle/communityProperties.modle.js";
-
 export const viewCommunities = async (req, res) => {
   community
     .find({}, { community_name: 1, description: 1, _id: 0 })
@@ -13,7 +12,6 @@ export const viewCommunities = async (req, res) => {
       res.send("something error");
     });
 };
-
 export const getCommunities = async (req, res) => {
   try {
     const communities = await community.find(); //.select('community_name'); اختار ايش اعرض
@@ -23,13 +21,11 @@ export const getCommunities = async (req, res) => {
     return res.status(500).json({ message: "Internal Server Error" });
   }
 };
-
 export const getSpecificCommunity = async (req, res) => {
   const { id } = req.params;
   const Community = await community.findById(id);
   return res.status(200).json({ message: "success", Community });
 };
-
 export const createCommunity = async (req, res) => {
   try {
     // التحقق من وجود ملف في الطلب
@@ -80,7 +76,6 @@ export const createCommunity = async (req, res) => {
     return res.status(500).json({ message: "Internal Server Error" });
   }
 };
-
 export const updateCommunity = async (req, res) => {
   const Community = await community.findById(req.params.id);
 
@@ -93,7 +88,6 @@ export const updateCommunity = async (req, res) => {
         .status(404)
         .json({ message: `Community not found with id: ${req.params.id}` });
     }
-
     if (req.body.community_name) {
       if (
         await community
@@ -104,19 +98,15 @@ export const updateCommunity = async (req, res) => {
           message: `Community ${req.body.community_name} name already exists`,
         });
       }
-
       Community.community_name = req.body.community_name;
       Community.slug = slugify(req.body.community_name);
     }
-
     if (req.body.status) {
       Community.status = req.body.status;
     }
-
     if (req.body.description) {
       Community.description = req.body.description;
     }
-
     if (req.file) {
       const { secure_url, public_id } = await cloudinary.uploader.upload(
         req.file.path,
@@ -135,7 +125,6 @@ export const updateCommunity = async (req, res) => {
     return res.status(500).json({ message: "Internal Server Error" });
   }
 };
-
 export const getActiveCommunities = async (req, res) => {
   try {
     const communities = await Community.find({ status: "Active" }).select(
@@ -179,7 +168,6 @@ export const updateProperty = async (req, res) => {
   try {
     const propertyId = req.params.id;
     const updatedFields = req.body;
-
     // التحقق من وجود الخاصية
     const propertyInstance = await communityproperties.findById(propertyId);
     if (!propertyInstance) {
@@ -187,7 +175,6 @@ export const updateProperty = async (req, res) => {
         .status(404)
         .json({ message: `Property not found with id: ${propertyId}` });
     }
-
     // التحقق من وجود اسم الخاصية المحدثة
     if (updatedFields.propertyD) {
       const existingProperty = await communityproperties.findOne({

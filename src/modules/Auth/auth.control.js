@@ -7,19 +7,15 @@ import { nanoid } from "nanoid";
 import { customAlphabet } from "nanoid";
 export const SignUp = async (req, res) => {
   const { firstName, lastName, email, password } = req.body;
-
   try {
     const user = await userModel.findOne({ email });
-
     if (user) {
       return res.status(409).json({ message: "Email already exists" });
     }
-
     const hashedPassword = await bcrypt.hash(
       password,
       parseInt(process.env.SALT_ROUND)
     );
-
     const newUser = await userModel.create({
       firstName,
       lastName,
@@ -116,9 +112,12 @@ export const SignIn = async (req, res) => {
   try {
     const user = await logModel.findOne({ email });
     const userconfirm = await userModel.findOne({ email });
+    // if (role === 'SuperAdmin' && !user.confirmEmail) {
+    //   return res.status(401).json({ message: "Email not confirmed for SuperAdmin" });
+    // }
     if (!user) {
       return res.status(404).json({ message: "User not found" });
-    } else if (!userconfirm.confirmEmail) {
+    } else if (role === "User" && !userconfirm.confirmEmail) {
       return res.status(401).json({ message: "Email not confirmed" });
     }
     const isPasswordValid = await bcrypt.compare(password, user.password);
