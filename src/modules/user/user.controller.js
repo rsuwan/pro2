@@ -72,15 +72,20 @@ export const deleteuser = async (req, res) => {
   };
   
 
-export const viewUser = async (req, res) => {
-    user.find({}, {})
-        .then(user => {
-            return res.status(200).send(user);
+  export const viewUsers = async (req, res) => {
+    try {
+      const Uesrs = await user.find();
+      const Uesrslog = await log
+        .find({
+          role: { $in: ["User"] },
         })
-        .catch(() => {
-            return res.status(404).send({ msg: "can not view the users list" })
-        });
-};
+        .select("email state_us role");
+      return res.status(200).json({ message: "success", Uesrs, Uesrslog });
+    } catch (error) {
+      console.error("Error:", error);
+      return res.status(500).json({ message: "Internal Server Error" });
+    }
+  };
 
 export const disableUser = async (req, res) => {
     const  {email}  = req.body;
