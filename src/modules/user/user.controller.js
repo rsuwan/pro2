@@ -70,7 +70,7 @@ export const viewUser = async (req, res) => {
 export const disableUser = async (req, res) => {
     const  {email}  = req.body;
     if (email) {
-      log.findOneAndUpdate({ email, state_us: false })
+      log.findOneAndUpdate({ email},{state_us: false} )
         .then(() => {
           return res.status(200).send({ msg: "admin account is disabled" });
         }).catch(() => {
@@ -84,7 +84,7 @@ export const disableUser = async (req, res) => {
   export const enableUser = async (req, res) => {
     const {email} = req.body;
     if (email) {
-      log.findOneAndUpdate({ email, state_us: true })
+      log.findOneAndUpdate({ email},{state_us: true} )
         .then(() => {
           return res.status(200).send({ msg: "admin account is enabled" });
         }).catch(() => {

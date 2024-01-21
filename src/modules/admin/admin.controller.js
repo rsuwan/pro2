@@ -82,16 +82,7 @@ export const deleteAdmin = async (req, res) => {
   }
 };
 
-export const viewAdmin = async (req, res) => {
-  admin
-    .find({}, {})
-    .then((adminD) => {
-      return res.status(200).send(adminD);
-    })
-    .catch(() => {
-      return res.status(404).send({ msg: "can not view the admins list" });
-    });
-};
+
 export const viewCommunityAdmin = async (req, res) => {
   const { email } = req.body;
   if (email != undefined) {
@@ -115,7 +106,7 @@ export const disableAdmin = async (req, res) => {
   const { email } = req.body;
   if (email) {
     log
-      .findOneAndUpdate({ email, state_us: false })
+      .findOneAndUpdate({ email}, {state_us: false })
       .then(() => {
         return res.status(200).send({ msg: "admin account is disabled" });
       })
@@ -131,7 +122,7 @@ export const enableAdmin = async (req, res) => {
   const { email } = req.body;
   if (email) {
     log
-      .findOneAndUpdate({ email, state_us: true })
+      .findOneAndUpdate({ email}, {state_us: true })
       .then(() => {
         return res.status(200).send({ msg: "admin account is enabled" });
       })
@@ -144,24 +135,37 @@ export const enableAdmin = async (req, res) => {
 };
 
 export const recoverPassword = async (req, res) => {
-  const { email, password } = req.body;
-  if (email != undefined) {
-    log
-      .findOne({ email: email })
-      .then(() => {
-        log
-          .updateOne({ email: email }, { password: password })
-          .then(() => {
-            return res.status(200).send({ msg: "password is updated" });
-          })
-          .catch(() => {
-            return res.status(500).send({ msg: "cannot update password" });
-          });
-      })
-      .catch(() => {
-        return res.status(500).send({ msg: "cannot find this account" });
-      });
-  } else {
-    return res.status(404).send({ msg: "this account is invalid" });
+  try {
+    const { email, password } = req.body;
+
+    if (!email) {
+      return res.status(400).send({ msg: "Invalid account" });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, parseInt(process.env.SALT_ROUND));
+    
+    const user = await log.findOne({ email });
+
+    if (!user) {
+      return res.status(404).send({ msg: "Account not found" });
+    }
+
+    await log.updateOne({ email }, { password: hashedPassword });
+
+    return res.status(200).send({ msg: "Password is updated" });
+  } catch (error) {
+    console.error("Error:", error);
+    return res.status(500).send({ msg: "Internal Server Error" });
+  }
+};
+
+export const viewAdmin = async (req, res) => {
+  try {
+    const Admins = await admin.find();
+    const Adminslog = await log.find({$or: [{ role: "SuperAdmin" }, { role: "SubAdmin" }]}).select('state_us role ');
+    return res.status(200).json({ message: "success", Admins, Adminslog });
+  } catch (error) {
+    console.error("Error:", error);
+    return res.status(500).json({ message: "Internal Server Error" });
   }
 };
