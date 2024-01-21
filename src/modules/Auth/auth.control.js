@@ -86,17 +86,24 @@ export const confirmEmail = async (req, res) => {
 
 export const sendCode = async (req, res) => {
   const { email } = req.body;
-  try {
-    let code = customAlphabet("1234567890", 4);
 
-    code = code();
-    const user = await userModel.findOneAndUpdate(
+  try {
+    const user = await logModel.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const code = customAlphabet("1234567890", 4)();
+    
+    await userModel.findOneAndUpdate(
       { email },
       { sendCode: code },
       { new: true }
     );
     const html = `<h2>The code is: ${code}</h2>`;
     await sendemail(email, `Reset Password`, html);
+
     return res.status(200).json({ message: "Success", user });
   } catch (error) {
     console.error("Error in sendCode:", error);
@@ -107,7 +114,6 @@ export const forgotPassword = async (req, res) => {
   const { email, password, code } = req.body;
   const usercode = await userModel.findOne({ email });
   const user = await logModel.findOne({ email });
-
   if (!user) {
     return res.status(404).json({ message: "not register account" });
   }
