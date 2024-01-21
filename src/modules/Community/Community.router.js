@@ -7,7 +7,7 @@ router.post(
   fileUpload(fileValidation.image).single("image"),
   communitycontroller.createCommunity
 );
-router.get("/viewCommunities", communitycontroller.viewCommunities);
+//router.get("/viewCommunities", communitycontroller.viewCommunities);
 router.get("/getCommunities", communitycontroller.getCommunities);
 router.get("/getactiveCommunities", communitycontroller.getActiveCommunities);
 router.get("/:id", communitycontroller.getSpecificCommunity);

@@ -48,37 +48,25 @@ export const addAdmin = async (req, res) => {
 }
 export const deleteAdmin = async (req, res) => {
   const { email } = req.body;
-  if (email != undefined) {
-    log
-      .findOne({ email: email })
-      .then(() => {
-        admin
-          .deleteOne({ email: email })
-          .then(() => {
-            log
-              .deleteOne({ email: email })
-              .then(() => {
-                return res
-                  .status(200)
-                  .send({ msg: "delete this account successfully" });
-              })
-              .catch(() => {
-                return res.status(404).send({
-                  msg: "can not delete this account from log collection",
-                });
-              });
-          })
-          .catch(() => {
-            return res.status(404).send({
-              msg: "can not delete this account from user collection",
-            });
-          });
-      })
-      .catch(() => {
-        return res.status(404).send({ msg: "this account is invalid" });
-      });
+    
+  if (email !== undefined) {
+    try {
+      const userRecord = await log.findOne({ email });
+
+      if (!userRecord) {
+        return res.status(404).send({ msg: "Account not found" });
+      }
+
+      await admin.deleteOne({ email });
+      await log.deleteOne({ email });
+
+      return res.status(200).send({ msg: "Account deleted successfully" });
+    } catch (error) {
+      console.error("Error:", error);
+      return res.status(500).send({ msg: "Internal Server Error" });
+    }
   } else {
-    return res.status(404).send({ msg: "this account is invalid" });
+    return res.status(400).send({ msg: "Invalid account" });
   }
 };
 

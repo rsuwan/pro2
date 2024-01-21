@@ -27,35 +27,50 @@ export const addUser = async (req, res) => {
         return res.status(401).send({ msg: 'unfilled fields' });
     }
 };
-export const deleteuser = async (req, res) => {
-    const {id}= req.params;
-    const user = await user.destroy({
-        where:{id}
-    });
-};
 export const deleteUser = async (req, res) => {
-    const { email } = req.body;
-    if (email != undefined) {
-        log.findOne({ email: email })
-            .then(() => {
-                user.deleteOne({ email: email })
-                    .then(() => {
-                        log.deleteOne({ email: email })
-                            .then(() => {
-                                return res.status(200).send({ msg: "delete this account successfully" })
-                            })
-                            .catch(() => {
-                                return res.status(404).send({ msg: "can not delete this account from log collection" })
-                            });
-                    })
-                    .catch(() => {
-                        return res.status(404).send({ msg: "can not delete this account from user collection" })
-                    });
-            })
-    } else {
-        return res.status(404).send({ msg: "this account is invalid" });
+    const { userId } = req.params;
+
+    try {
+      const deletedUser = await log.destroy({
+        where: { id: userId }
+      });
+    
+      if (deletedUser) {
+        return res.status(200).json({ message: "User deleted successfully" });
+      } else {
+        return res.status(404).json({ message: "User not found" });
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      return res.status(500).json({ message: "Internal Server Error" });
     }
+    
+    
 };
+export const deleteuser = async (req, res) => {
+    const { email } = req.body;
+    
+    if (email !== undefined) {
+      try {
+        const userRecord = await log.findOne({ email });
+  
+        if (!userRecord) {
+          return res.status(404).send({ msg: "Account not found" });
+        }
+  
+        await user.deleteOne({ email });
+        await log.deleteOne({ email });
+  
+        return res.status(200).send({ msg: "Account deleted successfully" });
+      } catch (error) {
+        console.error("Error:", error);
+        return res.status(500).send({ msg: "Internal Server Error" });
+      }
+    } else {
+      return res.status(400).send({ msg: "Invalid account" });
+    }
+  };
+  
 
 export const viewUser = async (req, res) => {
     user.find({}, {})

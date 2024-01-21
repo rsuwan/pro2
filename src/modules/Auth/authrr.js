@@ -85,23 +85,23 @@ export const confirmEmail = async (req, res) => {
 export const sendCode = async (req, res) => {
   const { email } = req.body;
   try {
-  let code = customAlphabet("1234567890", 4);
+    let code = customAlphabet("1234567890", 4);
 
-  code = code();
-  const user = await userModel.findOneAndUpdate(
-    { email },
-    { sendCode: code },
-    { new: true }
-  );
-  const html = `<h2>The code is: ${code}</h2>`;
-  await sendemail(email, `Reset Password`, html);
-  return res.status(200).json({ message: "Success", user });
+    code = code();
+    const user = await userModel.findOneAndUpdate(
+      { email },
+      { sendCode: code },
+      { new: true }
+    );
+    const html = `<h2>The code is: ${code}</h2>`;
+    await sendemail(email, `Reset Password`, html);
+    return res.status(200).json({ message: "Success", user });
   } catch (error) {
     console.error("Error in sendCode:", error);
     return res.status(500).json({ message: "Internal Server Error" });
   }
 };
-export const forgotPassword =async(req, res) => {
+export const forgotPassword = async (req, res) => {
   const { email, password, code } = req.body;
   const usercode = await userModel.findOne({ email });
   const user = await logModel.findOne({ email });
