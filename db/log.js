@@ -1,14 +1,22 @@
 import mongoose,{Schema, model} from 'mongoose'
 
 const logSchema =  new Schema({
-    email: {
-        type: String,
-      required: [true, "Email is required"],
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+    validate: {
+      validator: (value) => {
+        // Update the regular expression based on your requirements
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+      },
+      error: "Please enter a valid email address",
     },
+  },
     role: {
         type: String,
         default:'User',
-        enum: ['SuperAdmin', 'Admin', 'User'],
+        enum: ['SuperAdmin', 'SubAdmin', 'User'],
     },
     state_us: {
         type: Boolean,
@@ -17,6 +25,8 @@ const logSchema =  new Schema({
     password: {
         type: String,
       required: [true, "Password is required"],
+      min: 8,
+      max: 20,
     }
 });
 const logModel= mongoose.models.Log||model('Log',logSchema);

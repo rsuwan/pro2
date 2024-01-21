@@ -7,7 +7,7 @@ import AdminRouter from "./admin/admin.router.js";
 import UserRouter from "./user/user.router.js";
 const initapp = async (app, express) => {
   const router = Router();
-
+//jokq fxzt cvma sleg, email:r.r.suwan2001@gmail.com
   app.use(express.json());
 
   // Connect to the database

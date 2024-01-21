@@ -1,6 +1,8 @@
 import admin from "../../../db/modle/admin.modle.js";
 import communities from "../../../db/modle/community.modle.js";
 import log from "../../../db/log.js";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 export const community = async (req, res) => {
   communities
     .find({}, {})
@@ -13,12 +15,18 @@ export const community = async (req, res) => {
 };
 export const addAdmin = async (req, res) => {
   const { first_name, last_name, email, password, adminAt, degree, bithday, address } = req.body;
-  console.log({ first_name, last_name, email, password, adminAt, degree, bithday, address });
+  //console.log({ first_name, last_name, email, password, adminAt, degree, bithday, address });
   const findAdmin = await log.findOne({ "email": email })
-  console.log(findAdmin);
+  //console.log(findAdmin);
+  
+  const hashedPassword = await bcrypt.hash(
+    password,
+    parseInt(process.env.SALT_ROUND)
+  );
   if (findAdmin) {
     return res.status(401).send({ msg: 'this admin is already exists' });
-  } else {
+  }
+ else {
     const newAdmin = await admin.create({
       "email": email,
       "first_name": first_name,
@@ -31,7 +39,8 @@ export const addAdmin = async (req, res) => {
     const newAdminLog = await log.create({
       "email": email,
       "role": degree,
-      "password": password,
+      "password": hashedPassword,
+
     });
     newAdminLog.save();
     return res.status(201).send({ msg: 'admin created' });

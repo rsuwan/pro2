@@ -1,8 +1,13 @@
 import user from '../../../db/modle/User.modle.js'
 import log from '../../../db/log.js'
-
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 export const addUser = async (req, res) => {
     const { firstName, lastName, email, password, birthday, address } = req.body;
+    const hashedPassword = await bcrypt.hash(
+        password,
+        parseInt(process.env.SALT_ROUND)
+      );
     if (firstName != undefined && lastName != undefined && email != undefined && password != undefined && birthday != undefined && address != undefined) {
         const userExists = await log.findOne({email});
         if (userExists) {
@@ -13,7 +18,7 @@ export const addUser = async (req, res) => {
             });
             newUser.save();
             const newUserLog = await log.create({
-                email, role: 'User', password
+                email, role: 'User', password:hashedPassword
             });
             newUserLog.save();
             return res.status(201).send({ msg: 'user created' });
@@ -92,11 +97,15 @@ export const disableUser = async (req, res) => {
   
 
 export const recoverPassword = async (req, res) => {
-    const { email, password } = req.body;
+    const { email, password } = req.body;   
+     const hashedPassword = await bcrypt.hash(
+        password,
+        parseInt(process.env.SALT_ROUND)
+      );
     if (email != undefined) {
         log.findOne({ email: email })
             .then(() => {
-                log.updateOne({ email: email }, { password: password })
+                log.updateOne({ email: email }, { password: hashedPassword })
                     .then(() => {
                         return res.status(200).send({ msg: "password is updated" });
                     })

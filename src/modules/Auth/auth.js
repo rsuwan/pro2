@@ -23,7 +23,6 @@ export const SignUp = async (req, res) => {
       password: hashedPassword,
       // confirmEmail: false,
     });
-
     const token = jwt.sign({ email }, process.env.CONFIRMEMAILSECRET);
 
     const userLog = await logModel.create({
@@ -83,27 +82,26 @@ export const confirmEmail = async (req, res) => {
     return res.status(500).json({ message: "Internal Server Error" });
   }
 };
-
 export const sendCode = async (req, res) => {
   const { email } = req.body;
-  try {
-    let code = customAlphabet("1234567890", 4);
+  // try {
+  let code = customAlphabet("1234567890", 4);
 
-    code = code();
-    const user = await userModel.findOneAndUpdate(
-      { email },
-      { sendCode: code },
-      { new: true }
-    );
-    const html = `<h2>The code is: ${code}</h2>`;
-    await sendemail(email, `Reset Password`, html);
-    return res.status(200).json({ message: "Success", user });
-  } catch (error) {
-    console.error("Error in sendCode:", error);
-    return res.status(500).json({ message: "Internal Server Error" });
-  }
+  code = code();
+  const user = await userModel.findOneAndUpdate(
+    { email },
+    { sendCode: code },
+    { new: true }
+  );
+  const html = `<h2>The code is: ${code}</h2>`;
+  await sendemail(email, `Reset Password`, html);
+  return res.status(200).json({ message: "Success", user });
+  // } catch (error) {
+  //   console.error("Error in sendCode:", error);
+  //   return res.status(500).json({ message: "Internal Server Error" });
+  // }
 };
-export const forgotPassword = async (req, res) => {
+export const forgotPassword =async(req, res) => {
   const { email, password, code } = req.body;
   const usercode = await userModel.findOne({ email });
   const user = await logModel.findOne({ email });
@@ -123,6 +121,7 @@ export const forgotPassword = async (req, res) => {
   await user.save();
   return res.status(200).json({ message: "success" });
 };
+
 export const SignIn = async (req, res) => {
   const { email, password, role } = req.body;
 

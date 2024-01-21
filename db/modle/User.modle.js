@@ -27,7 +27,7 @@ const userSchema = new Schema(
           // Update the regular expression based on your requirements
           return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
         },
-        message: "Please enter a valid email address",
+        error: "Please enter a valid email address",
       },
     },
 

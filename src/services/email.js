@@ -14,4 +14,4 @@ export async function sendemail(to, subject, html) {
     html,
   });
   return info;
-}
+};

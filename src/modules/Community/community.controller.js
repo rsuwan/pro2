@@ -81,7 +81,6 @@ export const updateCommunity = async (req, res) => {
 
   // return res .json(Community);
   try {
-    const Community = await community.findById(req.params.id);
 
     if (!Community) {
       return res
@@ -127,7 +126,7 @@ export const updateCommunity = async (req, res) => {
 };
 export const getActiveCommunities = async (req, res) => {
   try {
-    const communities = await Community.find({ status: "Active" }).select(
+    const communities = await community.find({ status: "Active" }).select(
       "community_name image description"
     );
     return res.status(200).json({ message: "success", communities });
