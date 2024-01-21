@@ -150,7 +150,7 @@ export const recoverPassword = async (req, res) => {
 export const viewAdmin = async (req, res) => {
   try {
     const Admins = await admin.find();
-    const Adminslog = await log.find({$or: [{ role: "SuperAdmin" }, { role: "SubAdmin" }]}).select('state_us role ');
+    const Adminslog = await log.find().select(' email state_us role ');
     return res.status(200).json({ message: "success", Admins, Adminslog });
   } catch (error) {
     console.error("Error:", error);

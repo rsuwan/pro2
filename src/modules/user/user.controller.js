@@ -87,7 +87,7 @@ export const disableUser = async (req, res) => {
     if (email) {
       log.findOneAndUpdate({ email},{state_us: false} )
         .then(() => {
-          return res.status(200).send({ msg: "admin account is disabled" });
+          return res.status(200).send({ msg: "User account is disabled" });
         }).catch(() => {
           return res.status(304).send({ msg: "cannot disable this account" })
         })
@@ -101,7 +101,7 @@ export const disableUser = async (req, res) => {
     if (email) {
       log.findOneAndUpdate({ email},{state_us: true} )
         .then(() => {
-          return res.status(200).send({ msg: "admin account is enabled" });
+          return res.status(200).send({ msg: "User account is enabled" });
         }).catch(() => {
           return res.status(304).send({ msg: "cannot enable  this account" })
         })
