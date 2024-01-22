@@ -27,27 +27,33 @@ export const addUser = async (req, res) => {
         return res.status(401).send({ msg: 'unfilled fields' });
     }
 };
-export const deleteUser = async (req, res) => {
-    const { userId } = req.params;
+export const deleteuser = async (req, res) => {
+  const userEmail = req.params.email;
 
+  if (userEmail !== undefined) {
     try {
-      const deletedUser = await log.destroy({
-        where: { id: userId }
-      });
-    
-      if (deletedUser) {
-        return res.status(200).json({ message: "User deleted successfully" });
-      } else {
-        return res.status(404).json({ message: "User not found" });
+      const userRecord = await log.findOne({ email: userEmail });
+
+      if (!userRecord) {
+        return res.status(404).send({ msg: "User not found" });
       }
+
+      await user.deleteOne({ email: userEmail });
+      await log.deleteOne({ email: userEmail });
+
+      return res.status(200).send({ msg: "User deleted successfully" });
     } catch (error) {
       console.error("Error:", error);
-      return res.status(500).json({ message: "Internal Server Error" });
+      return res.status(500).send({ msg: "Internal Server Error" });
     }
-    
-    
+  } else {
+    return res.status(400).send({ msg: "Invalid user email" });
+  }
 };
-export const deleteuser = async (req, res) => {
+;
+
+
+export const deleteUser = async (req, res) => {
     const { email } = req.body;
     
     if (email !== undefined) {

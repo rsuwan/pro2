@@ -81,7 +81,6 @@ export const updateCommunity = async (req, res) => {
 
   // return res .json(Community);
   try {
-
     if (!Community) {
       return res
         .status(404)
