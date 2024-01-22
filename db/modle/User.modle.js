@@ -50,10 +50,7 @@ const userSchema = new Schema(
     address: {
       type: String,
     },
-    sendCode: {
-      type: String,
-      default: null,
-    },
+
     image: {
       type: Object,
     },

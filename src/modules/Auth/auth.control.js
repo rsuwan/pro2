@@ -96,7 +96,7 @@ export const sendCode = async (req, res) => {
 
     const code = customAlphabet("1234567890", 4)();
 
-    const updatedUser = await userModel.findOneAndUpdate(
+    const updatedUser = await logModel.findOneAndUpdate(
       { email },
       { sendCode: code },
       { new: true }
@@ -113,13 +113,11 @@ export const sendCode = async (req, res) => {
 };
 export const forgotPassword = async (req, res) => {
   const { email, password, code } = req.body;
-  const usercode = await userModel.findOne({ email });
   const user = await logModel.findOne({ email });
-
   if (!user) {
     return res.status(404).json({ message: "not register account" });
   }
-  if (usercode.sendCode !== code) {
+  if (user.sendCode !== code) {
     return res.status(400).json({ message: "invalid code" });
   }
   let match = await bcrypt.compare(password, user.password);
@@ -127,7 +125,7 @@ export const forgotPassword = async (req, res) => {
     return res.status(405).json({ message: "same password" });
   }
   user.password = await bcrypt.hash(password, parseInt(process.env.SALT_ROUND));
-  usercode.sendCode = null;
+  user.sendCode = null;
   await user.save();
   return res.status(200).json({ message: "success" });
 };

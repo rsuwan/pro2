@@ -17,16 +17,16 @@ const adminSchema = new mongoose.Schema({
     match: [/^[A-Za-z]+$/, "last name should contain only letters"],
   },
   email: {
-     type: String,
-      required: true,
-      unique: true,
-      validate: {
-        validator: (value) => {
-          // Update the regular expression based on your requirements
-          return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
-        },
-        error: "Please enter a valid email address",
+    type: String,
+    required: true,
+    unique: true,
+    validate: {
+      validator: (value) => {
+        // Update the regular expression based on your requirements
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
       },
+      error: "Please enter a valid email address",
+    },
   },
   phone: {
     type: String,
