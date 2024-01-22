@@ -155,19 +155,33 @@ export const recoverPassword = async (req, res) => {
     return res.status(500).send({ msg: "Internal Server Error" });
   }
 };
-
-export const viewAdmin = async (req, res) => {
+export const viewAdmins = async (req, res) => {
   try {
-    const Admins = await admin.find();
+    const Admins = await admin.find().lean();
     const Adminslog = await log
       .find({
         role: { $in: ["SubAdmin", "SuperAdmin"] },
       })
-      .select("email state_us role");
-    return res.status(200).json({ message: "success", Admins, Adminslog });
+      .select("email state_us role")
+      .lean();
+
+    // Combine Admins and AdminsLog based on email
+    const mergedAdmins = Admins.map(individualAdmin => {
+      const logInfo = Adminslog.find(log => log.email === individualAdmin.email) || {};
+      return { ...individualAdmin, ...logInfo };
+    });
+
+    const response = {
+      message: "success",
+      Admins: mergedAdmins,
+    };
+
+    return res.status(200).json(response);
   } catch (error) {
     console.error("Error:", error);
     return res.status(500).json({ message: "Internal Server Error" });
   }
 };
+
+
 

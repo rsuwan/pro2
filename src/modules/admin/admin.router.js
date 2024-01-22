@@ -5,7 +5,7 @@ const router = Router();
 router.post("/addAdmin", AdminController.addAdmin);
 router.get("/addAdmin/community", AdminController.community);
 //router.post("/deleteAdmin", AdminController.deleteAdmin);
-router.get("/viewAdmin", AdminController.viewAdmin);
+router.get("/viewAdmin", AdminController.viewAdmins);
 router.post("/viewCommunityAdmin", AdminController.viewCommunityAdmin);
 router.post("/disableAdmin", AdminController.disableAdmin);
 router.post("/enableAdmin", AdminController.enableAdmin);
