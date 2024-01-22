@@ -3,6 +3,7 @@ import communities from "../../../db/modle/community.modle.js";
 import log from "../../../db/log.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+
 export const community = async (req, res) => {
   communities
     .find({}, {})
@@ -54,29 +55,28 @@ export const addAdmin = async (req, res) => {
   }
 };
 export const deleteAdmin = async (req, res) => {
-  const { email } = req.body;
+  const adminEmail = req.params.email;
 
-  if (email !== undefined) {
+  if (adminEmail !== undefined) {
     try {
-      const userRecord = await log.findOne({ email });
+      const adminRecord = await log.findOne({ email: adminEmail });
 
-      if (!userRecord) {
-        return res.status(404).send({ msg: "Account not found" });
+      if (!adminRecord) {
+        return res.status(404).send({ msg: "Admin not found" });
       }
 
-      await admin.deleteOne({ email });
-      await log.deleteOne({ email });
+      await admin.deleteOne({ email: adminEmail });
+      await log.deleteOne({ email: adminEmail });
 
-      return res.status(200).send({ msg: "Account deleted successfully" });
+      return res.status(200).send({ msg: "Admin deleted successfully" });
     } catch (error) {
       console.error("Error:", error);
       return res.status(500).send({ msg: "Internal Server Error" });
     }
   } else {
-    return res.status(400).send({ msg: "Invalid account" });
+    return res.status(400).send({ msg: "Invalid admin email" });
   }
 };
-
 export const viewCommunityAdmin = async (req, res) => {
   const { email } = req.body;
   if (email != undefined) {
@@ -97,37 +97,39 @@ export const viewCommunityAdmin = async (req, res) => {
   }
 };
 export const disableAdmin = async (req, res) => {
-  const { email } = req.body;
-  if (email) {
-    log
-      .findOneAndUpdate({ email }, { state_us: false })
-      .then(() => {
-        return res.status(200).send({ msg: "admin account is disabled" });
-      })
-      .catch(() => {
-        return res.status(304).send({ msg: "cannot disable this account" });
-      });
-  } else {
-    return res.status(404).send({ msg: "this account is invalid" });
+  const adminEmail = req.params.email;
+  if (!adminEmail) {
+    return res.status(400).send({ msg: "Invalid admin email" });
+  }
+  try {
+    const adminRecord = await log.findOne({ email: adminEmail });
+    if (!adminRecord) {
+      return res.status(404).send({ msg: "Admin not found" });
+    }
+    await log.findOneAndUpdate({ email: adminEmail }, { state_us: false });
+    return res.status(200).send({ msg: "Admin account is disabled" });
+  } catch (error) {
+    console.error("Error:", error);
+    return res.status(500).send({ msg: "Cannot disable this account" });
   }
 };
-
 export const enableAdmin = async (req, res) => {
-  const { email } = req.body;
-  if (email) {
-    log
-      .findOneAndUpdate({ email }, { state_us: true })
-      .then(() => {
-        return res.status(200).send({ msg: "admin account is enabled" });
-      })
-      .catch(() => {
-        return res.status(304).send({ msg: "cannot enable  this account" });
-      });
-  } else {
-    return res.status(404).send({ msg: "this account is invalid" });
+  const adminEmail = req.params.email;
+  if (!adminEmail) {
+    return res.status(400).send({ msg: "Invalid admin email" });
+  }
+  try {
+    const adminRecord = await log.findOne({ email: adminEmail });
+    if (!adminRecord) {
+      return res.status(404).send({ msg: "Admin not found" });
+    }
+    await log.findOneAndUpdate({ email: adminEmail }, { state_us: true });
+    return res.status(200).send({ msg: "Admin account is enabled" });
+  } catch (error) {
+    console.error("Error:", error);
+    return res.status(500).send({ msg: "Cannot enable this account" });
   }
 };
-
 export const recoverPassword = async (req, res) => {
   try {
     const { email, password } = req.body;

@@ -5,8 +5,7 @@ const router = Router();
 router.post("/addUser", AdminController.addUser);
 router.delete('/deleteUser/:email', AdminController.deleteuser);
 router.get("/viewUser", AdminController.viewUsers);
-router.post("/disableUser", AdminController.disableUser);
-router.post("/enableUser", AdminController.enableUser);
 router.post("/recoverPassword", AdminController.recoverPassword);
-
+router.post('/disableUser/:email', AdminController.disableUser);
+router.post('/enableUser/:email', AdminController.enableUser);
 export default router;
