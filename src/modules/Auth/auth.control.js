@@ -3,7 +3,7 @@ import logModel from "../../../db/log.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { sendemail } from "../../services/email.js";
-import { nanoid } from "nanoid";
+//import { nanoid } from "nanoid";
 import { customAlphabet } from "nanoid";
 export const SignUp = async (req, res) => {
   const { firstName, lastName, email, password } = req.body;
@@ -48,7 +48,6 @@ export const SignUp = async (req, res) => {
       .json({ message: "Internal Server Error", error: error.message });
   }
 };
-
 export const confirmEmail = async (req, res) => {
   const token = req.params.token;
 
@@ -83,7 +82,6 @@ export const confirmEmail = async (req, res) => {
     return res.status(500).json({ message: "Internal Server Error" });
   }
 };
-
 export const sendCode = async (req, res) => {
   const { email } = req.body;
 
@@ -96,7 +94,7 @@ export const sendCode = async (req, res) => {
 
     const code = customAlphabet("1234567890", 4)();
 
-    const updatedUser = await logModel.findOneAndUpdate(
+    const updatedUser = await userModel.findOneAndUpdate(
       { email },
       { sendCode: code },
       { new: true }
@@ -113,11 +111,13 @@ export const sendCode = async (req, res) => {
 };
 export const forgotPassword = async (req, res) => {
   const { email, password, code } = req.body;
+  const usercode = await userModel.findOne({ email });
   const user = await logModel.findOne({ email });
+
   if (!user) {
     return res.status(404).json({ message: "not register account" });
   }
-  if (user.sendCode !== code) {
+  if (usercode.sendCode !== code) {
     return res.status(400).json({ message: "invalid code" });
   }
   let match = await bcrypt.compare(password, user.password);
@@ -125,7 +125,7 @@ export const forgotPassword = async (req, res) => {
     return res.status(405).json({ message: "same password" });
   }
   user.password = await bcrypt.hash(password, parseInt(process.env.SALT_ROUND));
-  user.sendCode = null;
+  usercode.sendCode = null;
   await user.save();
   return res.status(200).json({ message: "success" });
 };
@@ -177,4 +177,49 @@ export const SignIn = async (req, res) => {
     console.error(`Error in SignIn for user ${email}:`, error);
     return res.status(500).json({ message: "Internal Server Error" });
   }
+};
+export const sendCode2 = async (req, res) => {
+  const { email } = req.body;
+
+  try {
+    const user = await logModel.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const code = customAlphabet("1234567890", 4)();
+
+    const updatedUser = await logModel.findOneAndUpdate(
+      { email },
+      { sendCode: code },
+      { new: true }
+    );
+
+    const html = `<h2>The code is: ${code}</h2>`;
+    await sendemail(email, `Reset Password`, html);
+
+    return res.status(200).json({ message: "Success", user: updatedUser });
+  } catch (error) {
+    console.error("Error in sendCode:", error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+export const forgotPassword2 = async (req, res) => {
+  const { email, password, code } = req.body;
+  const user = await logModel.findOne({ email });
+  if (!user) {
+    return res.status(404).json({ message: "not register account" });
+  }
+  if (user.sendCode !== code) {
+    return res.status(400).json({ message: "invalid code" });
+  }
+  let match = await bcrypt.compare(password, user.password);
+  if (match) {
+    return res.status(405).json({ message: "same password" });
+  }
+  user.password = await bcrypt.hash(password, parseInt(process.env.SALT_ROUND));
+  user.sendCode = null;
+  await user.save();
+  return res.status(200).json({ message: "success" });
 };

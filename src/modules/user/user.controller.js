@@ -74,18 +74,33 @@ export const deleteuser = async (req, res) => {
 
   export const viewUsers = async (req, res) => {
     try {
-      const Uesrs = await user.find();
-      const Uesrslog = await log
+      const Users = await user.find().lean();
+      const UsersLog = await log
         .find({
           role: { $in: ["User"] },
         })
-        .select("email state_us role");
-      return res.status(200).json({ message: "success", Uesrs, Uesrslog });
+        .select("email state_us role")
+        .lean();
+  
+      // Combine Users and UsersLog based on email
+      const mergedUsers = Users.map(user => {
+        const logInfo = UsersLog.find(log => log.email === user.email) || {};
+        return { ...user, ...logInfo };
+      });
+  
+      const response = {
+        message: "success",
+        Users: mergedUsers,
+      };
+  
+      return res.status(200).json(response);
     } catch (error) {
       console.error("Error:", error);
       return res.status(500).json({ message: "Internal Server Error" });
     }
   };
+  
+  
 
 export const disableUser = async (req, res) => {
     const  {email}  = req.body;
