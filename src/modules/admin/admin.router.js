@@ -5,10 +5,10 @@ const router = Router();
 router.post("/addAdmin", AdminController.addAdmin);
 router.get("/addAdmin/community", AdminController.community);
 router.delete("/deleteAdmin/:email", AdminController.deleteAdmin);
-router.get("/viewAdmin", AdminController.viewAdmins);
-router.post("/viewCommunityAdmin", AdminController.viewCommunityAdmin);
+router.get("/:email/viewAdmin", AdminController.viewAdmins);
+router.get("/:email/viewCommunityAdmin", AdminController.viewCommunityAdmins);
 router.post("/disableAccount/:email", AdminController.disableAccount);
 router.post("/enableAccount/:email", AdminController.enableAccount);
-router.post("/recoverPassword", AdminController.recoverPassword);
+router.post("/recoverPassword/:email", AdminController.recoverPassword);
 
 export default router;

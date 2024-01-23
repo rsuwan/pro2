@@ -78,23 +78,38 @@ export const deleteAdmin = async (req, res) => {
     return res.status(400).send({ msg: "Invalid admin email" });
   }
 };
-export const viewCommunityAdmin = async (req, res) => {
-  const { email } = req.body;
-  if (email != undefined) {
-    admin.findOne({ email }, { community_id: 1, _id: 0 }).then((community) => {
-      console.log(community);
-      admin
-        .find({ community_id: community.community_id }, {})
-        .then((admins) => {
-          console.log({ admins });
-          return res.send(admins);
-        })
-        .catch(() => {
-          return res.status(200).send({ msg: "cannot view the admins list" });
-        });
+export const viewCommunityAdmins = async (req, res) => {
+  try {
+    const userEmail = req.params.email;
+
+    if (!userEmail) {
+      return res.status(404).send({ msg: "Invalid email" });
+    }
+
+    const community = await admin.findOne({ email: userEmail }, { community_id: 1, _id: 0 });
+
+    if (!community) {
+      return res.status(404).send({ msg: "Admin not found or not associated with any community" });
+    }
+
+    // Exclude the user's email from the query
+    const admins = await admin.find({
+      community_id: community.community_id,
+      email: { $ne: userEmail } // $ne means not equal to
     });
-  } else {
-    return res.status(404).send({ msg: "this account is invalid" });
+
+    // Fetch additional information from the log table for each admin
+    const adminsPromiseArray = admins.map(async (admin) => {
+      const logInfo = await log.findOne({ email: admin.email });
+      return { ...admin.toObject(), ...logInfo?.toObject() }; // Use optional chaining to handle null logInfo
+    });
+
+    const adminsWithLogInfo = await Promise.all(adminsPromiseArray);
+
+    return res.status(200).send(adminsWithLogInfo);
+  } catch (error) {
+    console.error("Error:", error);
+    return res.status(500).send({ msg: "Internal Server Error" });
   }
 };
 export const disableAccount = async (req, res) => {
@@ -107,7 +122,7 @@ export const disableAccount = async (req, res) => {
     if (!adminRecord) {
       return res.status(404).send({ msg: "Account not found" });
     }
-    await log.findOneAndUpdate({ email: adminEmail }, { state_us: true });
+    await log.findOneAndUpdate({ email: adminEmail }, { state_us: false });
     return res.status(200).send({ msg: "Account is disabled" });
   } catch (error) {
     console.error("Error:", error);
@@ -124,43 +139,50 @@ export const enableAccount = async (req, res) => {
     if (!adminRecord) {
       return res.status(404).send({ msg: "Account not found" });
     }
-    await log.findOneAndUpdate({ email: adminEmail }, { state_us: false });
+    await log.findOneAndUpdate({ email: adminEmail }, { state_us: true });
     return res.status(200).send({ msg: "Account is enabled" });
   } catch (error) {
     console.error("Error:", error);
     return res.status(500).send({ msg: "Cannot enable this account" });
   }
 };
+
 export const recoverPassword = async (req, res) => {
-  const { email, password } = req.body;   
-   const hashedPassword = await bcrypt.hash(
-      password,
-      parseInt(process.env.SALT_ROUND)
-    );
-  if (email != undefined) {
-      log.findOne({ email: email })
-          .then(() => {
-              log.updateOne({ email: email }, { password: hashedPassword })
-                  .then(() => {
-                      return res.status(200).send({ msg: "password is updated" });
-                  })
-                  .catch(() => {
-                      return res.status(304).send({ msg: "cannot update password" });
-                  });
-          })
-          .catch(() => {
-              return res.status(500).send({ msg: "cannot find this account" });
-          });
-  } else {
-      return res.status(404).send({ msg: "this account is invalid" });
+  const email = req.params.email;
+  const { password } = req.body;
+
+  if (!email) {
+    return res.status(400).send({ msg: "Invalid email" });
+  }
+
+  try {
+    const hashedPassword = await bcrypt.hash(password, parseInt(process.env.SALT_ROUND));
+
+    const userRecord = await log.findOne({ email });
+
+    if (!userRecord) {
+      return res.status(404).send({ msg: "User not found" });
+    }
+
+    await log.updateOne({ email }, { password: hashedPassword });
+
+    return res.status(200).send({ msg: "Password is updated" });
+  } catch (error) {
+    console.error("Error:", error);
+    return res.status(500).send({ msg: "Internal Server Error" });
   }
 };
+
+
 export const viewAdmins = async (req, res) => {
   try {
-    const Admins = await admin.find().lean();
+    const userEmail = req.params.email; // Assuming you can get the user's email from the request
+
+    const Admins = await admin.find({ email: { $ne: userEmail } }).lean();
     const Adminslog = await log
       .find({
         role: { $in: ["SubAdmin", "SuperAdmin"] },
+        email: { $ne: userEmail }, // Exclude the user's email
       })
       .select("email state_us role")
       .lean();

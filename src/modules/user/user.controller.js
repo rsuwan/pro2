@@ -77,8 +77,8 @@ export const deleteuser = async (req, res) => {
       console.error("Error:", error);
       return res.status(500).json({ message: "Internal Server Error" });
     }
-  };
-  
+};
+
 export const disableUsers = async (req, res) => {
     const  {email}  = req.body;
     if (email) {
@@ -91,9 +91,9 @@ export const disableUsers = async (req, res) => {
     } else {
       return res.status(404).send({ msg: "this account is invalid" });
     }
-  };
-  
-  export const enableUsers = async (req, res) => {
+};
+
+export const enableUsers = async (req, res) => {
     const {email} = req.body;
     if (email) {
       log.findOneAndUpdate({ email},{state_us: true} )
@@ -105,28 +105,30 @@ export const disableUsers = async (req, res) => {
     } else {
       return res.status(404).send({ msg: "this account is invalid" });
     }
-  };
+};
+
 export const recoverPassword = async (req, res) => {
-    const { email, password } = req.body;   
-     const hashedPassword = await bcrypt.hash(
-        password,
-        parseInt(process.env.SALT_ROUND)
-      );
-    if (email != undefined) {
-        log.findOne({ email: email })
-            .then(() => {
-                log.updateOne({ email: email }, { password: hashedPassword })
-                    .then(() => {
-                        return res.status(200).send({ msg: "password is updated" });
-                    })
-                    .catch(() => {
-                        return res.status(304).send({ msg: "cannot update password" });
-                    });
-            })
-            .catch(() => {
-                return res.status(500).send({ msg: "cannot find this account" });
-            });
-    } else {
-        return res.status(404).send({ msg: "this account is invalid" });
-    }
+  const email = req.params.email;
+  const { password } = req.body;
+
+  if (!email) {
+      return res.status(400).send({ msg: "Invalid email" });
+  }
+
+  try {
+      const hashedPassword = await bcrypt.hash(password, parseInt(process.env.SALT_ROUND));
+
+      const userRecord = await log.findOne({ email });
+
+      if (!userRecord) {
+          return res.status(404).send({ msg: "User not found" });
+      }
+
+      await log.updateOne({ email }, { password: hashedPassword });
+
+      return res.status(200).send({ msg: "Password is updated" });
+  } catch (error) {
+      console.error("Error:", error);
+      return res.status(500).send({ msg: "Internal Server Error" });
+  }
 };
