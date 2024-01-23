@@ -153,10 +153,7 @@ export const SignIn = async (req, res) => {
       if (!userconfirm.confirmEmail) {
         return res.status(401).json({ message: "Email not confirmed" });
       }
-    } else if (user.role == "SubAdmin") {
-      auther = admin.findOneById({ email }, { _id: 0, community_id: 1 });
-      console.log(auther);
-    }
+    } 
     const token = jwt.sign(
       { id: user._id, role: user.role, state_us: user.state_us, auth: auther },
       process.env.JWT_SECRET,
@@ -169,6 +166,7 @@ export const SignIn = async (req, res) => {
     );
     return res.status(200).json({
       message: "User signed in successfully",
+      email:email,
       role: user.role,
       token: token,
       refreshtoken,

@@ -43,7 +43,7 @@ export const createPost = async (req, res) => {
         const newPost = new post({
             community_name: communityName,
             like: 0,
-            properties: input,
+            properties: input   ,
         });
         newPost.save();
         return res.status(201).send({ msg: "created successfuly:)" })
@@ -52,7 +52,7 @@ export const createPost = async (req, res) => {
     }
 };
 
-export const viewPost = async (req, res) => {
+export const viewPosts = async (req, res) => {
     try {
         const communityParams = req.params;
         const communityName = communityParams.community;

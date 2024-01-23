@@ -10,7 +10,7 @@ router.post(
 //router.get("/viewCommunities", communitycontroller.viewCommunities);
 router.get("/getCommunities", communitycontroller.getCommunities);
 router.get("/getactiveCommunities", communitycontroller.getActiveCommunities);
-router.get("/:id", communitycontroller.getSpecificCommunity);
+//router.get("/:id", communitycontroller.getSpecificCommunity);
 router.post("/addProperty", communitycontroller.addProperty);
 router.post("/viewProperty", communitycontroller.viewProperty);
 router.post("/removeProperty", communitycontroller.removeProperty);

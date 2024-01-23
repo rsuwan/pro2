@@ -2,7 +2,7 @@ import mongoose, { Schema, model } from "mongoose";
 const PostSchema = new mongoose.Schema({
   user_email: {
     type: String,
-    required: [true, "Uer email is required"],
+    // required: [true, "Uer email is required"],
   },
   community_name: {
     type: String,
@@ -15,12 +15,12 @@ const PostSchema = new mongoose.Schema({
   },
   mainImage: {
     type: Object,
-    required: [true, "main Image is required"],
+  //  required: [true, "main Image is required"],
   },
   supImages: [
     {
       type: Object,
-      required: [true, "sup Images is required"],
+    //  required: [true, "sup Images is required"],
     },
   ],
   properties: [{

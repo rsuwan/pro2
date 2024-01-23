@@ -52,6 +52,7 @@ export const deleteuser = async (req, res) => {
   }
 };
   export const viewUsers = async (req, res) => {
+   
     try {
       const Users = await user.find().lean();
       const UsersLog = await log
@@ -60,18 +61,15 @@ export const deleteuser = async (req, res) => {
         })
         .select("email state_us role")
         .lean();
-  
       // Combine Users and UsersLog based on email
       const mergedUsers = Users.map(user => {
         const logInfo = UsersLog.find(log => log.email === user.email) || {};
         return { ...user, ...logInfo };
       });
-  
       const response = {
         message: "success",
         Users: mergedUsers,
       };
-  
       return res.status(200).json(response);
     } catch (error) {
       console.error("Error:", error);

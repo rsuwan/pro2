@@ -4,7 +4,6 @@ import log from "../../../db/log.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
-
 export const community = async (req, res) => {
   communities
     .find({}, {})
@@ -15,6 +14,7 @@ export const community = async (req, res) => {
       return res.status(404).send({ msg: "con not find communities" });
     });
 };
+//////////////////////////////////////////////////////////////////////////////
 export const addAdmin = async (req, res) => {
   const {
     first_name,
@@ -55,6 +55,7 @@ export const addAdmin = async (req, res) => {
     return res.status(201).send({ msg: "admin created" });
   }
 };
+//////////////////////////////////////////////////////////////////////////////
 export const deleteAdmin = async (req, res) => {
   const adminEmail = req.params.email;
 
@@ -78,20 +79,17 @@ export const deleteAdmin = async (req, res) => {
     return res.status(400).send({ msg: "Invalid admin email" });
   }
 };
+//////////////////////////////////////////////////////////////////////////////
 export const viewCommunityAdmins = async (req, res) => {
   try {
     const userEmail = req.params.email;
-
     if (!userEmail) {
       return res.status(404).send({ msg: "Invalid email" });
     }
-
     const community = await admin.findOne({ email: userEmail }, { community_id: 1, _id: 0 });
-
     if (!community) {
       return res.status(404).send({ msg: "Admin not found or not associated with any community" });
     }
-
     // Exclude the user's email from the query
     const admins = await admin.find({
       community_id: community.community_id,
@@ -112,6 +110,7 @@ export const viewCommunityAdmins = async (req, res) => {
     return res.status(500).send({ msg: "Internal Server Error" });
   }
 };
+//////////////////////////////////////////////////////////////////////////////
 export const disableAccount = async (req, res) => {
   const adminEmail = req.params.email;
   if (!adminEmail) {
@@ -129,6 +128,7 @@ export const disableAccount = async (req, res) => {
     return res.status(500).send({ msg: "Cannot disable this account" });
   }
 };
+//////////////////////////////////////////////////////////////////////////////
 export const enableAccount = async (req, res) => {
   const adminEmail = req.params.email;
   if (!adminEmail) {
@@ -146,7 +146,7 @@ export const enableAccount = async (req, res) => {
     return res.status(500).send({ msg: "Cannot enable this account" });
   }
 };
-
+//////////////////////////////////////////////////////////////////////////////
 export const recoverPassword = async (req, res) => {
   const email = req.params.email;
   const { password } = req.body;
@@ -172,8 +172,7 @@ export const recoverPassword = async (req, res) => {
     return res.status(500).send({ msg: "Internal Server Error" });
   }
 };
-
-
+//////////////////////////////////////////////////////////////////////////////
 export const viewAdmins = async (req, res) => {
   try {
     const userEmail = req.params.email; // Assuming you can get the user's email from the request
