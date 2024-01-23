@@ -96,66 +96,66 @@ export const viewCommunityAdmin = async (req, res) => {
     return res.status(404).send({ msg: "this account is invalid" });
   }
 };
-export const disableAdmin = async (req, res) => {
+export const disableAccount = async (req, res) => {
   const adminEmail = req.params.email;
   if (!adminEmail) {
-    return res.status(400).send({ msg: "Invalid admin email" });
+    return res.status(400).send({ msg: "Invalid Account email" });
   }
   try {
     const adminRecord = await log.findOne({ email: adminEmail });
     if (!adminRecord) {
-      return res.status(404).send({ msg: "Admin not found" });
+      return res.status(404).send({ msg: "Account not found" });
     }
     await log.findOneAndUpdate({ email: adminEmail }, { state_us: false });
-    return res.status(200).send({ msg: "Admin account is disabled" });
+    return res.status(200).send({ msg: "Account is disabled" });
   } catch (error) {
     console.error("Error:", error);
     return res.status(500).send({ msg: "Cannot disable this account" });
   }
 };
-export const enableAdmin = async (req, res) => {
+export const enableAccount = async (req, res) => {
   const adminEmail = req.params.email;
   if (!adminEmail) {
-    return res.status(400).send({ msg: "Invalid admin email" });
+    return res.status(400).send({ msg: "Invalid Account email" });
   }
   try {
     const adminRecord = await log.findOne({ email: adminEmail });
     if (!adminRecord) {
-      return res.status(404).send({ msg: "Admin not found" });
+      return res.status(404).send({ msg: "Account not found" });
     }
     await log.findOneAndUpdate({ email: adminEmail }, { state_us: true });
-    return res.status(200).send({ msg: "Admin account is enabled" });
+    return res.status(200).send({ msg: "Account is enabled" });
   } catch (error) {
     console.error("Error:", error);
     return res.status(500).send({ msg: "Cannot enable this account" });
   }
 };
 export const recoverPassword = async (req, res) => {
-  try {
-    const { email, password } = req.body;
+    const { email } = req.params;
+    const { password } = req.body;
 
-    if (!email) {
-      return res.status(400).send({ msg: "Invalid account" });
+    if (email !== undefined) {
+        try {
+            const userRecord = await log.findOne({ email });
+
+            if (!userRecord) {
+                return res.status(404).send({ msg: "Account not found" });
+            }
+
+            // Hash the new password
+            const hashedPassword = await bcrypt.hash(password, parseInt(process.env.SALT_ROUND));
+
+            // Update the user's password
+            await log.findOneAndUpdate({ email }, { password: hashedPassword });
+
+            return res.status(200).send({ msg: "Password reset successfully" });
+        } catch (error) {
+            console.error("Error:", error);
+            return res.status(500).send({ msg: "Internal Server Error" });
+        }
+    } else {
+        return res.status(400).send({ msg: "Invalid account" });
     }
-
-    const hashedPassword = await bcrypt.hash(
-      password,
-      parseInt(process.env.SALT_ROUND)
-    );
-
-    const user = await log.findOne({ email });
-
-    if (!user) {
-      return res.status(404).send({ msg: "Account not found" });
-    }
-
-    await log.updateOne({ email }, { password: hashedPassword });
-
-    return res.status(200).send({ msg: "Password is updated" });
-  } catch (error) {
-    console.error("Error:", error);
-    return res.status(500).send({ msg: "Internal Server Error" });
-  }
 };
 export const viewAdmins = async (req, res) => {
   try {

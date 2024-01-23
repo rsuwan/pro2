@@ -7,8 +7,8 @@ router.get("/addAdmin/community", AdminController.community);
 router.delete("/deleteAdmin/:email", AdminController.deleteAdmin);
 router.get("/viewAdmin", AdminController.viewAdmins);
 router.post("/viewCommunityAdmin", AdminController.viewCommunityAdmin);
-router.post("/disableAdmin/:email", AdminController.disableAdmin);
-router.post("/enableAdmin/:email", AdminController.enableAdmin);
-router.post("/recoverPassword", AdminController.recoverPassword);
+router.post("/disableAccount/:email", AdminController.disableAccount);
+router.post("/enableAccount/:email", AdminController.enableAccount);
+router.post("/recoverPassword/:email", AdminController.recoverPassword);
 
 export default router;
