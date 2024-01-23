@@ -4,6 +4,7 @@ import log from "../../../db/log.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
+
 export const community = async (req, res) => {
   communities
     .find({}, {})
@@ -131,31 +132,28 @@ export const enableAccount = async (req, res) => {
   }
 };
 export const recoverPassword = async (req, res) => {
-    const { email } = req.params;
-    const { password } = req.body;
-
-    if (email !== undefined) {
-        try {
-            const userRecord = await log.findOne({ email });
-
-            if (!userRecord) {
-                return res.status(404).send({ msg: "Account not found" });
-            }
-
-            // Hash the new password
-            const hashedPassword = await bcrypt.hash(password, parseInt(process.env.SALT_ROUND));
-
-            // Update the user's password
-            await log.findOneAndUpdate({ email }, { password: hashedPassword });
-
-            return res.status(200).send({ msg: "Password reset successfully" });
-        } catch (error) {
-            console.error("Error:", error);
-            return res.status(500).send({ msg: "Internal Server Error" });
-        }
-    } else {
-        return res.status(400).send({ msg: "Invalid account" });
-    }
+  const { email, password } = req.body;   
+   const hashedPassword = await bcrypt.hash(
+      password,
+      parseInt(process.env.SALT_ROUND)
+    );
+  if (email != undefined) {
+      log.findOne({ email: email })
+          .then(() => {
+              log.updateOne({ email: email }, { password: hashedPassword })
+                  .then(() => {
+                      return res.status(200).send({ msg: "password is updated" });
+                  })
+                  .catch(() => {
+                      return res.status(304).send({ msg: "cannot update password" });
+                  });
+          })
+          .catch(() => {
+              return res.status(500).send({ msg: "cannot find this account" });
+          });
+  } else {
+      return res.status(404).send({ msg: "this account is invalid" });
+  }
 };
 export const viewAdmins = async (req, res) => {
   try {

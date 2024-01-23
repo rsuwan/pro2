@@ -9,6 +9,6 @@ router.get("/viewAdmin", AdminController.viewAdmins);
 router.post("/viewCommunityAdmin", AdminController.viewCommunityAdmin);
 router.post("/disableAccount/:email", AdminController.disableAccount);
 router.post("/enableAccount/:email", AdminController.enableAccount);
-router.post("/recoverPassword/:email", AdminController.recoverPassword);
+router.post("/recoverPassword", AdminController.recoverPassword);
 
 export default router;
