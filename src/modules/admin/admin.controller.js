@@ -107,7 +107,7 @@ export const disableAccount = async (req, res) => {
     if (!adminRecord) {
       return res.status(404).send({ msg: "Account not found" });
     }
-    await log.findOneAndUpdate({ email: adminEmail }, { state_us: false });
+    await log.findOneAndUpdate({ email: adminEmail }, { state_us: true });
     return res.status(200).send({ msg: "Account is disabled" });
   } catch (error) {
     console.error("Error:", error);
@@ -124,7 +124,7 @@ export const enableAccount = async (req, res) => {
     if (!adminRecord) {
       return res.status(404).send({ msg: "Account not found" });
     }
-    await log.findOneAndUpdate({ email: adminEmail }, { state_us: true });
+    await log.findOneAndUpdate({ email: adminEmail }, { state_us: false });
     return res.status(200).send({ msg: "Account is enabled" });
   } catch (error) {
     console.error("Error:", error);
