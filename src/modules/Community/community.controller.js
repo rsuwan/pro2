@@ -146,8 +146,9 @@ export const addProperty = async (req, res) => {
   console.log(latestCommunity);
   console.log(latestCommunity.community_name);
   const propertyDB = await communityproperties.findOne({
-    $and: [{ property: propertyD }, { community_Name: latestCommunity }],
+    $and: [{ property: propertyD }, { community_Name: latestCommunity.community_name }],
   });
+  console.log(propertyDB);
   if (propertyDB) {
     res.status(401).send({ msg: "This this property already exists" });
   } else {

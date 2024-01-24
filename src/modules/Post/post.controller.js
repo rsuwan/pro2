@@ -24,7 +24,6 @@ export const postView = async (req, res) => {
         res.status(500).send({ msg: 'Error retrieving properties' });
     }
 };
-
 export const createPost = async (req, res) => {
     try {
         const { community, id } = req.params;
@@ -51,7 +50,6 @@ export const createPost = async (req, res) => {
         return res.status(500).send({ msg: 'Error retrieving properties' });
     }
 };
-
 export const viewPost = async (req, res) => {
     try {
         const communityParams = req.params;
@@ -74,7 +72,6 @@ export const viewPost = async (req, res) => {
     }
 };
 ////////////////////////////////////////////////////////////////////////////////////
-
 export const createPosts = async (req, res) => {
   try {
     const { community, id } = req.params;
@@ -157,5 +154,3 @@ export const deletePost = async (req, res) => {
       return res.status(500).send({ msg: 'Internal Server Error' });
     }
 };
-
-  
