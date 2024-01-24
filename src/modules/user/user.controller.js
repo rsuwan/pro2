@@ -76,7 +76,6 @@ export const deleteuser = async (req, res) => {
       return res.status(500).json({ message: "Internal Server Error" });
     }
 };
-
 export const disableUsers = async (req, res) => {
     const  {email}  = req.body;
     if (email) {
@@ -104,7 +103,6 @@ export const enableUsers = async (req, res) => {
       return res.status(404).send({ msg: "this account is invalid" });
     }
 };
-
 export const recoverPassword = async (req, res) => {
   const email = req.params.email;
   const { password } = req.body;

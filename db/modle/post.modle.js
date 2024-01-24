@@ -28,9 +28,13 @@ const postSchema = new mongoose.Schema({
     ref: 'CommunityProperties',
   }],
   comments: [{ type: mongoose.Types.ObjectId, ref: 'Comment' }],
+  createdBy: { type: mongoose.Types.ObjectId, ref: "User",required:true },
+  updatedBy: { type: mongoose.Types.ObjectId, ref: "User",required:true },
+  community: [{ type: mongoose.Types.ObjectId, ref: "Community",required:true  }],
 }, {
   timestamps: true,
 });
+
 
 const postModel = mongoose.models.Post || model("Post", postSchema);
 export default postModel;

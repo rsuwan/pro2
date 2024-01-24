@@ -8,6 +8,7 @@ const adminSchema = new mongoose.Schema({
     max: 50,
     match: [/^[A-Za-z]+$/, "First name should contain only letters"],
   },
+  
   last_name: {
     type: String,
     required: [true, "Last name is required"],

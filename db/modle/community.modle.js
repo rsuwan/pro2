@@ -26,10 +26,17 @@ const communitySchema = new Schema({
   },
   createdBy: { type: mongoose.Types.ObjectId, ref: "SuperAdmin" },
   updatedBy: { type: mongoose.Types.ObjectId, ref: "SuperAdmin" },
-  posts: [{ type: mongoose.Types.ObjectId, ref: "Post" }],
+ /// posts: [{ type: mongoose.Types.ObjectId, ref: "Post" }],
 }, {
   timestamps: true,
+
 });
+communitySchema.virtual('post'),{
+localFileld:'_id',
+foreighField:'community_name',
+ref:'Post'
+
+}
 
 const Community = mongoose.model("Community", communitySchema);
 export default Community;

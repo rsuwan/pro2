@@ -1,5 +1,4 @@
 import mongoose, { Schema, model } from "mongoose";
-
 const commentSchema = new mongoose.Schema({
   post_id: {
     type: mongoose.Types.ObjectId,
@@ -17,13 +16,11 @@ const commentSchema = new mongoose.Schema({
 }, {
   timestamps: true,
 });
-
 commentSchema.virtual('post', {
   ref: 'Post',
   localField: 'post_id',
   foreignField: '_id',
   justOne: true
 });
-
 const commentModel = mongoose.models.Comment || model("Comment", commentSchema);
 export default commentModel;
