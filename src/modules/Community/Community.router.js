@@ -11,7 +11,7 @@ router.post(
 router.get("/getCommunities", communitycontroller.getCommunities);
 router.get("/getactiveCommunities", communitycontroller.getActiveCommunities);
 //router.get("/:id", communitycontroller.getSpecificCommunity);
-router.post("/addProperty", communitycontroller.addProperty);
+router.post("/:community_name/addProperty", communitycontroller.addProperty);
 router.post("/viewProperty", communitycontroller.viewProperty);
 router.delete("/:community_name/deleteCommunity", communitycontroller.deleteCommunity);
 

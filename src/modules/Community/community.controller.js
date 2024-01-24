@@ -137,7 +137,7 @@ export const getActiveCommunities = async (req, res) => {
   }
 };
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-export const addProperty = async (req, res) => {
+export const addPropertys = async (req, res) => {
   const { propertyD, ownerFillD, customerFillD, valueD } = req.body;
   const latestCommunity = await community
     .findOne({}, { community_name: 1, created_date: 1, _id: 0 })
@@ -322,6 +322,38 @@ export const deleteCommunity = async (req, res) => {
 
     // Add a return statement here with an error response
     return res.status(500).json({ message: 'Internal Server Error', error: error.message });
+  }
+};
+
+export const addProperty = async (req, res) => {
+  const { propertyD, ownerFillD, customerFillD, valueD } = req.body;
+  const { community_name } = req.params;  // تحديث اسم المتغير
+
+  const foundCommunity = await community.findOne({ community_name: community_name });
+
+  if (!foundCommunity) {
+    res.status(404).send({ msg: "Community not found." });
+    return;
+  }
+
+  const propertyDB = await communityproperties.findOne({
+    $and: [{ property: propertyD }, { community_Name: foundCommunity.community_name }],
+  });
+
+  if (propertyDB) {
+    res.status(401).send({ msg: "This property already exists." });
+  } else {
+    const newProperty = await communityproperties.create({
+      community_Name: foundCommunity.community_name,
+      property: propertyD,
+      value: valueD,
+      owner_fill: ownerFillD,
+      customer_fill: customerFillD,
+    });
+
+    newProperty.save();
+    console.log({ propertyD, valueD, ownerFillD, customerFillD });
+    res.send("Added successfully.");
   }
 };
 
