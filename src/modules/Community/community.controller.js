@@ -30,7 +30,7 @@ export const createCommunity = async (req, res) => {
   try {
     // التحقق من وجود ملف في الطلب
     if (!req.file) {
-      return res.status(400).json({ message: "Please upload a file" });
+      return res.status(400).json({ message: "Please upload a image" });
     }
 
     // التحقق من وجود البيانات اللازمة في req.body
