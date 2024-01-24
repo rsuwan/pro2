@@ -164,6 +164,7 @@ export const SignIn = async (req, res) => {
       process.env.JWT_SECRET,
       { expiresIn: 60 * 60 * 24 * 30 }
     );
+    
     return res.status(200).json({
       message: "User signed in successfully",
       email:email,

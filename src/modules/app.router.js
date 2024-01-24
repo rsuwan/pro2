@@ -5,6 +5,7 @@ import AuthRouter from "./Auth/atuh.router.js";
 import connectdb from "../../db/connection.js";
 import AdminRouter from "./admin/admin.router.js";
 import UserRouter from "./user/user.router.js";
+import CommentRouter from './comment/comment.router.js';
 const initapp = async (app, express) => {
   const router = Router();
 //jokq fxzt cvma sleg, email:r.r.suwan2001@gmail.com
@@ -28,6 +29,7 @@ const initapp = async (app, express) => {
   app.use("/admins", AdminRouter);
   app.use("/user", UserRouter);
   app.use("/communities", PostRouter);
+  app.use("/comments", CommentRouter);
 
   app.get("*", (req, res) => {
     return res.status(404).json({ message: "Page not found" });

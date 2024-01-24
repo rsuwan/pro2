@@ -40,11 +40,13 @@ export const createCommunity = async (req, res) => {
         .status(400)
         .json({ message: "Please provide community_name and description" });
     }
-
     const lowerCaseCommunityName = community_name.toLowerCase();
-
+console.log(lowerCaseCommunityName);
     // التحقق من عدم وجود اسم المجتمع في قاعدة البيانات
-    const existingCommunity = await community.findOne({ community_name });
+    const existingCommunity = await community.findOne({
+      community_name: { $regex: new RegExp(`^${community_name}$`, 'i') }
+    });
+    
     if (existingCommunity) {
       return res.status(409).json({ message: "Community name already exists" });
     }
@@ -161,7 +163,6 @@ export const addProperty = async (req, res) => {
     res.send("added successfuly");
   }
 };
-
 export const updateProperty = async (req, res) => {
   try {
     const propertyId = req.params.id;
@@ -215,7 +216,6 @@ export const updateProperty = async (req, res) => {
     return res.status(500).json({ message: "Internal Server Error" });
   }
 };
-
 export const viewProperty = async (req, res) => {
   const { communityName } = req.body;
   communityproperties
@@ -227,7 +227,6 @@ export const viewProperty = async (req, res) => {
       res.send("something error");
     });
 };
-
 export const removeProperty = async (req, res) => {
   const { communityName, propertyD } = req.body;
   communityproperties
@@ -240,7 +239,6 @@ export const removeProperty = async (req, res) => {
       return res.json("something error here!");
     });
 };
-
 export const cancleCreation = async (req, res) => {
   const { communityName } = req.body;
   communityproperties
@@ -260,3 +258,70 @@ export const cancleCreation = async (req, res) => {
       return res.json("something error here!");
     });
 };
+///Done
+export const deleteProperty = async (req, res) => {
+  const { community, id } = req.params;
+
+  if (!community || !id) {
+    return res.status(400).json({ msg: "Invalid community or property ID" });
+  }
+
+  try {
+    const result = await communityproperties.deleteOne({
+      community_Name: community,
+      _id: id, // Use _id for MongoDB ObjectId
+    });
+
+    if (result.deletedCount === 0) {
+      return res.status(404).json({ msg: "Property not found" });
+    }
+
+    return res.status(200).json({ msg: "Property deleted successfully" });
+  } catch (error) {
+    console.error("Error:", error);
+    return res.status(500).json({ msg: "Internal Server Error" });
+  }
+};
+export const deleteCommunity = async (req, res) => {
+  try {
+    const community_name = req.params.community_name;
+
+    console.log('Deleting community:', community_name);
+
+    // Find the community by name
+    const foundCommunity = await community.findOne({ community_name });
+
+    console.log('Found community:', foundCommunity);
+
+    if (!foundCommunity) {
+      console.log('Community not found');
+      return res.status(404).json({ message: 'Community not found' });
+    }
+
+    // Delete the community image from Cloudinary
+    await cloudinary.uploader.destroy(foundCommunity.image.public_id);
+
+    console.log('Community image deleted from Cloudinary');
+
+    // Delete the community from the database
+    const deletionResult = await community.deleteOne({ community_name });
+
+    console.log('Deletion result:', deletionResult);
+
+    if (deletionResult.deletedCount === 0) {
+      console.log('Community not deleted from the database');
+      return res.status(404).json({ message: 'Community not deleted from the database' });
+    }
+
+    console.log('Community deleted successfully');
+
+    return res.status(200).json({ message: 'Community deleted successfully' });
+  } catch (error) {
+    console.error('Error:', error);
+
+    // Add a return statement here with an error response
+    return res.status(500).json({ message: 'Internal Server Error', error: error.message });
+  }
+};
+
+

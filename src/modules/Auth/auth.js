@@ -5,6 +5,7 @@ import jwt from "jsonwebtoken";
 import { sendemail } from "../../services/email.js";
 import { nanoid } from "nanoid";
 import { customAlphabet } from "nanoid";
+
 export const SignUp = async (req, res) => {
   const { firstName, lastName, email, password } = req.body;
   try {
@@ -47,7 +48,6 @@ export const SignUp = async (req, res) => {
       .json({ message: "Internal Server Error", error: error.message });
   }
 };
-
 export const confirmEmail = async (req, res) => {
   const token = req.params.token;
 
@@ -121,10 +121,8 @@ export const forgotPassword =async(req, res) => {
   await user.save();
   return res.status(200).json({ message: "success" });
 };
-
 export const SignIn = async (req, res) => {
   const { email, password, role } = req.body;
-
   try {
     const user = await logModel.findOne({ email });
     if (!user) {
