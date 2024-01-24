@@ -1,8 +1,9 @@
 import mongoose, { Schema, model } from "mongoose";
-const PostSchema = new mongoose.Schema({
+
+const postSchema = new mongoose.Schema({
   user_email: {
     type: String,
-    // required: [true, "Uer email is required"],
+    required: [true, "User email is required"],
   },
   community_name: {
     type: String,
@@ -10,26 +11,26 @@ const PostSchema = new mongoose.Schema({
   },
   like: {
     type: Number,
-    //required: true,
     default: 0,
   },
   mainImage: {
     type: Object,
-  //  required: [true, "main Image is required"],
+    // required: [true, "Main image is required"],
   },
   supImages: [
     {
       type: Object,
-    //  required: [true, "sup Images is required"],
+      // required: [true, "Sup images are required"],
     },
   ],
   properties: [{
-
-
+    type: mongoose.Types.ObjectId,
+    ref: 'CommunityProperties',
   }],
-  
+  comments: [{ type: mongoose.Types.ObjectId, ref: 'Comment' }],
+}, {
+  timestamps: true,
 });
 
-// module.exports = mongoose.model('Post', PostSchema);
-const postModel = mongoose.models.Post || model("Post", PostSchema);
+const postModel = mongoose.models.Post || model("Post", postSchema);
 export default postModel;

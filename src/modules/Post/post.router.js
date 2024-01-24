@@ -1,7 +1,7 @@
 import { Router } from "express";
 import * as postcontroller from './post.controller.js';
 import fileUpload, { fileValidation } from "../../services/multer.js";
-const router = Router();
+const router = Router({mergeParams:true});
 
 router.get("/:community/postView", postcontroller.postView);
 router.post("/:community/:id/createPost", postcontroller.createPost);

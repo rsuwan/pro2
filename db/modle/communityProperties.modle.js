@@ -1,4 +1,5 @@
-import mongoose, { Schema, model, Types } from "mongoose";
+import mongoose, { Schema, model } from "mongoose";
+
 const communityPropertiesSchema = new mongoose.Schema({
   community_Name: {
     type: String,
@@ -6,7 +7,7 @@ const communityPropertiesSchema = new mongoose.Schema({
   },
   property: {
     type: String,
-    required: [true, "Property  is required"],
+    required: [true, "Property is required"],
   },
   value: {
     type: String,
@@ -21,7 +22,16 @@ const communityPropertiesSchema = new mongoose.Schema({
     required: [true, "Owner Fill is required"],
   },
 });
-const communityPropertiesSchemaModel =
-  mongoose.models.communityProperties ||
-  model("communityProperties", communityPropertiesSchema);
-export default communityPropertiesSchemaModel;
+
+// Virtual Populate
+communityPropertiesSchema.virtual('relatedPosts', {
+  ref: 'Post',  // اسم الموديل الذي يشير إليه
+  localField: '_id',  // الحقل في هذا الموديل
+  foreignField: 'properties',  // الحقل في الموديل الآخر
+  justOne: false,
+});
+
+const CommunityPropertiesModel = mongoose.models.communityProperties || model("communityProperties", communityPropertiesSchema);
+
+export default CommunityPropertiesModel;
+

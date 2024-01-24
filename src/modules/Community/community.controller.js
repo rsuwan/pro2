@@ -217,17 +217,7 @@ export const updateProperty = async (req, res) => {
     return res.status(500).json({ message: "Internal Server Error" });
   }
 };
-export const viewProperty = async (req, res) => {
-  const { communityName } = req.body;
-  communityproperties
-    .find({ community_Name: communityName }, { __v: 0 })
-    .then((propertiesD) => {
-      res.send(propertiesD);
-    })
-    .catch((err) => {
-      res.send("something error");
-    });
-};
+
 export const removeProperty = async (req, res) => {
   const { communityName, propertyD } = req.body;
   communityproperties
@@ -258,7 +248,19 @@ export const cancleCreation = async (req, res) => {
       console.error(err);
       return res.json("something error here!");
     });
+}
+export const viewProperty = async (req, res) => {
+  const { community_name } = req.params;
+  communityproperties
+    .find({ community_Name: community_name }, { __v: 0 })
+    .then((propertiesD) => {
+      res.send(propertiesD);
+    })
+    .catch((err) => {
+      res.send("something error");
+    });
 };
+
 ///Done
 export const deleteProperty = async (req, res) => {
   const { community, id } = req.params;
