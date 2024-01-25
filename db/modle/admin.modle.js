@@ -65,7 +65,13 @@ const adminSchema = new mongoose.Schema({
   image: {
     type: Object,
   },
-});
+  posts: [{ type: mongoose.Types.ObjectId, ref: 'Community' }],
+  comments: [{ type: mongoose.Types.ObjectId, ref: 'communityProperties' }],
+},
+{
+  timestamps: true,
+}
+);
 
 const adminModel = mongoose.models.Admin || model("Admin", adminSchema);
 export default adminModel;

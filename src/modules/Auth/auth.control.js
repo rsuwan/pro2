@@ -147,27 +147,27 @@ export const SignIn = async (req, res) => {
     if (!user.state_us) {
       return res.status(401).json({ message: "Account is disabled" });
     }
-    const auther = "all";
+
     if (user.role == "User") {
       const userconfirm = await userModel.findOne({ email });
       if (!userconfirm.confirmEmail) {
         return res.status(401).json({ message: "Email not confirmed" });
       }
-    } 
+    }
     const token = jwt.sign(
-      { id: user._id, role: user.role, state_us: user.state_us, auth: auther },
+      { id: user._id, role: user.role, state_us: user.state_us },
       process.env.JWT_SECRET,
       { expiresIn: "30m" }
     );
     const refreshtoken = jwt.sign(
-      { id: user._id, role: user.role, auth: auther },
+      { id: user._id, role: user.role, state_us: user.state_us },
       process.env.JWT_SECRET,
       { expiresIn: 60 * 60 * 24 * 30 }
     );
-    
+
     return res.status(200).json({
       message: "User signed in successfully",
-      email:email,
+      email: email,
       role: user.role,
       token: token,
       refreshtoken,

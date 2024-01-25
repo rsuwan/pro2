@@ -21,7 +21,16 @@ const communityPropertiesSchema = new mongoose.Schema({
     type: Boolean,
     required: [true, "Owner Fill is required"],
   },
-});
+  createdBy: { type: mongoose.Types.ObjectId, ref: "SuperAdmin" },
+  updatedBy: { type: mongoose.Types.ObjectId, ref: "SuperAdmin" },
+  // posts: [{ type: mongoose.Types.ObjectId, ref: "Post" }],
+},
+{
+  timestamps: true,
+  // toJSON: { virtuals: true },
+  // toObject: { virtuals: true },
+}
+);
 
 // Virtual Populate
 communityPropertiesSchema.virtual('relatedPosts', {

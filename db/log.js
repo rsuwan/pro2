@@ -25,15 +25,8 @@ const logSchema = new Schema({
   password: {
     type: String,
     required: [true, "Password is required"],
-    minlength: [8, "Password should be at least 8 characters long"],
-    maxlength: [20, "Password should not exceed 20 characters"],
-    validate: {
-      validator: (value) => {
-        // يتحقق من وجود أحرف وأرقام ورموز في كلمة المرور
-        return /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,20}$/.test(value);
-      },
-      message: "Password should contain at least one letter, one number, and one special character",
-    },
+    min: 8,
+    max: 20,
   },
   sendCode: {
     type: String,
