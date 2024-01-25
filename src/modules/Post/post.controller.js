@@ -2,6 +2,7 @@ import communityProperities from '../../../db/modle/communityProperties.modle.js
 import communities from '../../../db/modle/community.modle.js';
 import post from '../../../db/modle/post.modle.js';
 import user from '../../../db/modle/User.modle.js';
+
 export const postView = async (req, res) => {
    
     try {
@@ -24,32 +25,34 @@ export const postView = async (req, res) => {
         res.status(500).send({ msg: 'Error retrieving properties' });
     }
 };
-export const createPost = async (req, res) => {
-    try {
-        const { community, id } = req.params;
-        const foundCommunity = await communities.findOne({ community_name: community });
-        const foundID = await user.findOne({ email: id });
-        if (!foundCommunity) {
-            return res.status(404).send({ msg: 'Community not found' });
-        }
-        if (!foundID) {
-            return res.status(404).send({ msg: 'email not found' });
-        }
-        const { type, input } = req.body;
-        console.log(input);
-        const newPost = await post.create({
-            user_email: id,
-            community_name: community,
-            postType: type,
-            like: 0,
-            properties: input,
-        });
-        newPost.save();
-        return res.status(201).send({ msg: "created successfuly:)" });
-    } catch (err) {
-        return res.status(500).send({ msg: 'Error retrieving properties' });
-    }
+
+export const createPostold = async (req, res) => {
+  try {
+      const { community, id } = req.params;
+      const foundCommunity = await communities.findOne({ community_name: community });
+      const foundID = await user.findOne({ email: id });
+      if (!foundCommunity) {
+          return res.status(404).send({ msg: 'Community not found' });
+      }
+      if (!foundID) {
+          return res.status(404).send({ msg: 'email not found' });
+      }
+      const { type, input } = req.body;
+      console.log(input);
+      const newPost = await post.create({
+          user_email: id,
+          community_name: community,
+          userType: type,
+          like: 0,
+          properties: input,
+      });
+      newPost.save();
+      return res.status(201).send({ msg: "created successfuly:)" });
+  } catch (err) {
+      return res.status(500).send({ msg: 'Error retrieving properties' });
+  }
 };
+
 export const viewPost = async (req, res) => {
     try {
         const communityParams = req.params;
@@ -71,8 +74,10 @@ export const viewPost = async (req, res) => {
         return res.status(500).send({ msg: 'Error retrieving properties' });
     }
 };
+
 ////////////////////////////////////////////////////////////////////////////////////
-export const createPosts = async (req, res) => {
+
+export const createPost = async (req, res) => {
   try {
     const { community, id } = req.params;
     const foundCommunity = await communities.findOne({ community_name: community });
@@ -154,3 +159,78 @@ export const deletePost = async (req, res) => {
       return res.status(500).send({ msg: 'Internal Server Error' });
     }
 };
+export const createPosts = async (req, res) => {
+  try {
+    const { community, id } = req.params;
+    const { type, userType } = req.body; // Added userType to the request body
+    const foundCommunity = await communities.findOne({ community_name: community });
+    const foundID = await user.findOne({ email: id });
+    if (!foundCommunity) {
+      return res.status(404).send({ msg: 'Community not found' });
+    }
+
+    if (!foundID) {
+      return res.status(404).send({ msg: 'Email not found' });
+    }
+
+    const mainImage = req.files.mainImage[0];
+    const supImages = req.files.supImages || [];
+
+    const mainImageResult = await cloudinary.uploader.upload(mainImage.path, {
+      folder: `${process.env.APP_NAME}/post`,
+    });
+
+    const supImagesResults = await Promise.all(
+      supImages.map(async (supImage) => {
+        return cloudinary.uploader.upload(supImage.path, {
+          folder: `${process.env.APP_NAME}/post`,
+        });
+      })
+    );
+
+    // Use userType when creating a new post
+    const newPost = await post.create({
+      user_email: id,
+      community_name: community,
+      userType: userType, // Include userType in the created post
+      postType: type,
+      like: 0,
+      properties: {
+        mainImage: mainImageResult.secure_url,
+        supImages: supImagesResults.map((result) => result.secure_url),
+      },
+    });
+
+    newPost.save();
+    return res.status(201).send({ msg: "Created successfully :)", newPost });
+  } catch (err) {
+    console.error('Error:', err);
+    return res.status(500).send({ msg: 'Internal Server Error' });
+  }
+};
+// export const createPost = async (req, res) => {
+//   try {
+//       const { community, id } = req.params;
+//       const foundCommunity = await communities.findOne({ community_name: community });
+//       const foundID = await user.findOne({ email: id });
+//       if (!foundCommunity) {
+//           return res.status(404).send({ msg: 'Community not found' });
+//       }
+//       if (!foundID) {
+//           return res.status(404).send({ msg: 'email not found' });
+//       }
+//       const { type, input } = req.body;
+//       console.log(input);
+//       const newPost = await post.create({
+//           user_email: id,
+//           community_name: community,
+//           postType: type,
+//           like: 0,
+//           properties: input,
+//       });
+//       newPost.save();
+//       return res.status(201).send({ msg: "created successfuly:)" });
+//   } catch (err) {
+//       return res.status(500).send({ msg: 'Error retrieving properties' });
+//   }
+// };

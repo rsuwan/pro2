@@ -1,6 +1,4 @@
-
 import mongoose, { Schema, model } from "mongoose";
-
 const userSchema = new Schema(
   {
     firstName: {
@@ -17,19 +15,22 @@ const userSchema = new Schema(
       trim: true,
       min: 2,
       max: 50,
-      match: [/^[A-Za-z]+$/, "Last name should contain only letters"],
+      match: [/^[A-Za-z]+$/, "last name should contain only letters"],
     },
+
     email: {
       type: String,
-      required: [true, "Email is required"],
+      required: true,
       unique: true,
       validate: {
         validator: (value) => {
+          // Update the regular expression based on your requirements
           return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
         },
-        message: "Please enter a valid email address",
+        error: "Please enter a valid email address",
       },
     },
+
     confirmEmail: {
       type: Boolean,
       default: false,
@@ -49,11 +50,10 @@ const userSchema = new Schema(
     address: {
       type: String,
     },
+
     image: {
       type: Object,
     },
-    posts: [{ type: mongoose.Types.ObjectId, ref: 'Post' }],
-    comments: [{ type: mongoose.Types.ObjectId, ref: 'Comment' }],
   },
   {
     timestamps: true,
@@ -62,4 +62,3 @@ const userSchema = new Schema(
 
 const userModel = mongoose.models.User || model("User", userSchema);
 export default userModel;
-

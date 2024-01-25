@@ -12,6 +12,7 @@ export const viewCommunities = async (req, res) => {
       res.send("something error");
     });
 };
+
 export const getCommunities = async (req, res) => {
   try {
     /**** */
@@ -22,6 +23,7 @@ export const getCommunities = async (req, res) => {
     return res.status(500).json({ message: "Internal Server Error" });
   }
 };
+
 export const getSpecificCommunity = async (req, res) => {
   const { id } = req.params;
   const Community = await community.findById(id);

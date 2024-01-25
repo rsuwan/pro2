@@ -1,7 +1,7 @@
 const roles = {
-  Admin: "Admin",
-  User: "User",
-  SuperAdmin: "SuperAdmin",
+Admin: "Admin",
+User: "User",
+SuperAdmin: "SuperAdmin",
 };
 
 export const endPoint = {

@@ -1,16 +1,16 @@
-
 import mongoose, { Schema, model } from "mongoose";
 
 const logSchema = new Schema({
   email: {
     type: String,
-    required: [true, "Email is required"],
+    required: true,
     unique: true,
     validate: {
       validator: (value) => {
+        // Update the regular expression based on your requirements
         return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
       },
-      message: "Please enter a valid email address",
+      error: "Please enter a valid email address",
     },
   },
   role: {
@@ -32,9 +32,6 @@ const logSchema = new Schema({
     type: String,
     default: null,
   },
-}, {
-  timestamps: true,
 });
-
 const logModel = mongoose.models.Log || model("Log", logSchema);
 export default logModel;

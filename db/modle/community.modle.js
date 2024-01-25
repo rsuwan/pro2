@@ -1,5 +1,5 @@
-import mongoose, { Schema, model } from "mongoose";
-
+// community.modle.js
+import mongoose, { Schema, Types } from "mongoose";
 const communitySchema = new Schema(
   {
     community_name: {
@@ -24,22 +24,13 @@ const communitySchema = new Schema(
       default: "Active",
       enum: ["Active", "InActive"],
     },
-    createdBy: { type: mongoose.Types.ObjectId, ref: "SuperAdmin" },
-    updatedBy: { type: mongoose.Types.ObjectId, ref: "SuperAdmin" },
-    // posts: [{ type: mongoose.Types.ObjectId, ref: "Post" }],
+    createdBy: { type: Types.ObjectId, ref: "SuperAdmin" },
+    updatedBy: { type: Types.ObjectId, ref: "SuperAdmin" },
   },
   {
     timestamps: true,
-    toJSON: { virtuals: true },
-    toObject: { virtuals: true },
   }
 );
-
-communitySchema.virtual("post", {
-  localField: "_id",
-  foreignField: "community_name",
-  ref: "Post",
-});
-
 const Community = mongoose.model("Community", communitySchema);
 export default Community;
+
