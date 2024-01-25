@@ -37,6 +37,14 @@ export const createPostold = async (req, res) => {
       if (!foundID) {
           return res.status(404).send({ msg: 'email not found' });
       }
+      if (type === 'custom' && !input.customField) {
+        return res.status(400).send({ msg: 'customField is required for custom user type' });
+    }
+
+    // التحقق من أن النوع هو "owner" والبروبارتي موجودة
+    if (type === 'owner' && !input.ownerField) {
+        return res.status(400).send({ msg: 'ownerField is required for owner user type' });
+    }
       const { type, input } = req.body;
       console.log(input);
       const newPost = await post.create({
