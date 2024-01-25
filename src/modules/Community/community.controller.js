@@ -220,7 +220,6 @@ export const updateProperty = async (req, res) => {
     return res.status(500).json({ message: "Internal Server Error" });
   }
 };
-
 export const removeProperty = async (req, res) => {
   const { communityName, propertyD } = req.body;
   communityproperties
@@ -263,7 +262,6 @@ export const viewProperty = async (req, res) => {
       res.send("something error");
     });
 };
-
 ///Done
 export const deleteProperty = async (req, res) => {
   const { community, id } = req.params;
