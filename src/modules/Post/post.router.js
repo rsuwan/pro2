@@ -6,7 +6,7 @@ const router = Router({mergeParams:true});
 
 router.get("/:community/postView", postcontroller.postView);
 
-router.post("/:community/:id/createPostold", postcontroller.createPostold);
+router.post("/:community/:id/createPost", postcontroller.createPost);
 
 router.get("/:community/viewPosts", postcontroller.viewPost);
 router.delete("/:community/:id/deletePost/:postId", postcontroller.deletePost);

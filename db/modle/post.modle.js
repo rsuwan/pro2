@@ -2,8 +2,8 @@ import mongoose, { Schema, model } from "mongoose";
 
 const PostSchema = new mongoose.Schema({
   user_email: {
-    type: String,
-    // required: [true, "User email is required"],
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',    // required: [true, "User email is required"],
   },
   community_name: {
     type: String,
@@ -29,8 +29,12 @@ const PostSchema = new mongoose.Schema({
       // required: [true, "Sup Images is required"],
     },
   ],
-  properties: [{}],
-});
+  properties: [{}], 
+ },
+  {
+    timestamps: true,
+  }
+);
 
 const postModel = mongoose.models.Post || model("Post", PostSchema);
 export default postModel;
