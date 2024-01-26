@@ -5,8 +5,8 @@ import cors from 'cors';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-app.use(cors());
-
+// app.use(cors());
+app.options('*', cors(corsOptions));
 initApp(app,express);
 
 app.listen(PORT, () => {
