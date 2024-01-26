@@ -4,9 +4,11 @@ import initApp from './src/modules/app.router.js';
 import cors from 'cors'; 
 
 const app = express();
+app.use(cors());
+
+
 const PORT = process.env.PORT || 3000;
-// app.use(cors());
-app.options('*', cors(corsOptions));
+
 initApp(app,express);
 
 app.listen(PORT, () => {
