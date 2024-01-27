@@ -1,9 +1,12 @@
 import mongoose, { Schema, model } from "mongoose";
-
 const PostSchema = new mongoose.Schema({
   user_email: {
     type: String,
-    // required: [true, "User email is required"],
+    required: [true, "Uer email is required"],
+  },
+  user_name: {
+    type: String,
+    required: [true, "Uer email is required"],
   },
   community_name: {
     type: String,
@@ -11,29 +14,25 @@ const PostSchema = new mongoose.Schema({
   },
   like: {
     type: Number,
-    // required: true,
+    required: true,
     default: 0,
   },
-  mainImage: {
-    type: Object,
-    // required: [true, "Main Image is required"],
-  },
-  userType: {
+  post_type:{
     type: String,
-    enum: ["owner", "customer"],
-    required: [true, "User type is required"],
+    enum: ['owner', 'costomer'],
+    required: [true, "type is required"],
   },
   supImages: [
     {
       type: Object,
-      // required: [true, "Sup Images is required"],
+      // required: [true, "sup Images is required"],
     },
   ],
-  properties: [{}],  },
-  {
-    timestamps: true,
-  }
-);
+  properties: {
+
+  },
+
+});
 
 const postModel = mongoose.models.Post || model("Post", PostSchema);
 export default postModel;

@@ -11,6 +11,10 @@ const commentSchema = new mongoose.Schema({
         ref: 'User',
         // required: true,
     },
+    user_name: {
+        type: String,
+        required: [true, "Uer email is required"],
+    },
     content: {
         type: String,
         required: true
