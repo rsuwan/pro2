@@ -28,9 +28,7 @@ export const viewMyPosts = async (req, res) => {
         return res.status(500).send({ msg: 'Error retrieving properties' });
     }
 };
-
 export const viewMyComments = async (req, res) => {
-    // http://localhost:3000/userDo/raghad@gmail.com/viewMyComments
     try {
         const communityParams = req.params;
         const email = communityParams.email;
@@ -64,7 +62,6 @@ export const viewMyComments = async (req, res) => {
         return res.status(500).send({ msg: 'Error retrieving properties' });
     }
 };
-
 export const viewMyPersonalInformation = async (req, res) => {
     // http://localhost:3000/userDo/raghad@gmail.com/viewMyPersonalInformation
     const personalInfoParams = req.params;
@@ -84,7 +81,7 @@ export const viewMyPersonalInformation = async (req, res) => {
     catch (error) {
         return res.status(404).send({ msg: 'something error' });
     }
-}
+};
 export const updateMyPersonalInformation = async (req, res) => {
     // http://localhost:3000/userDo/raghad@gmail.com/viewMyPersonalInformation    const personalInfoParams = req.params;
     const personalInfoParams = req.params;
@@ -128,7 +125,7 @@ export const updateMyPersonalInformation = async (req, res) => {
     catch (error) {
         return res.status(500).send({ msg: 'something error' });
     }
-}
+};
 export const changePassword = async (req, res) => {
     //http://localhost:3000/userDo/raghad@gmail.com/changePassword
     const { password, newpassword } = req.body;
@@ -148,4 +145,4 @@ export const changePassword = async (req, res) => {
     } catch (err) {
         return res.status(500).send({ msg: err.message });
     }
-}
+};
