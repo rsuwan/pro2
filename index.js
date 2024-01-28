@@ -1,15 +1,14 @@
 import 'dotenv/config';
 import express from 'express';
-import cors from 'cors';
-//import compression from 'compression';
 import initApp from './src/modules/app.router.js';
-
+import cors from 'cors'; 
+import compression from 'compression'; 
 const app = express();
 app.use(cors());
-//app.use(compression());
+app.use(compression());
+const PORT = process.env.PORT || 3700;
+initApp(app,express);
 
-initApp(app, express);
-const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });

@@ -12,14 +12,11 @@ export const viewCommunities = async (req, res) => {
       res.send("something error");
     });
 };
-
 export const getCommunities = async (req, res) => {
   try {
-    /**** */
-    const communities = await community.find() //.select('community_name'); اختار ايش اعرض
+    const communities = await community.find(); //.select('community_name'); اختار ايش اعرض
     return res.status(200).json({ message: "success", communities });
   } catch (error) {
-    console.error("Error:", error);
     return res.status(500).json({ message: "Internal Server Error" });
   }
 };
