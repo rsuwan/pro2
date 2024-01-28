@@ -89,7 +89,6 @@ export const disableUsers = async (req, res) => {
       return res.status(404).send({ msg: "this account is invalid" });
     }
 };
-
 export const enableUsers = async (req, res) => {
     const {email} = req.body;
     if (email) {

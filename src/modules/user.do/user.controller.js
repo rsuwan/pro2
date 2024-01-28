@@ -85,7 +85,50 @@ export const viewMyPersonalInformation = async (req, res) => {
         return res.status(404).send({ msg: 'something error' });
     }
 }
+export const updateMyPersonalInformation = async (req, res) => {
+    // http://localhost:3000/userDo/raghad@gmail.com/viewMyPersonalInformation    const personalInfoParams = req.params;
+    const personalInfoParams = req.params;
+    const { firstName, lastName, phone, birth_date, address } = req.body;
+    const email = personalInfoParams.email;
+    try {
+        const userData = await log.findOne({ email: email });
+        if (!userData) {
+            return res.status(404).send({ msg: 'User Not Found' });
+        }
+        console.log(userData);
+        if (userData.role === 'User') {
+            console.log("sss");
+            const info = await user.updateOne({
+                email: email
+            }, {
+                $set: {
+                    firstName: firstName,
+                    lastName: lastName,
+                    phone: phone,
+                    address: address,
+                    birth_date: birth_date,
+                }
+            });
+            return res.status(200).send(info)
+        }
+        const info = await admin.updateOne({
+            email: email,
+        }, {
+            $set: {
+                first_name: firstName,
+                last_name: lastName,
+                phone: phone,
+                address: address,
+                birth_date: birth_date
+            }
+        });
 
+        return res.status(200).send(info)
+    }
+    catch (error) {
+        return res.status(500).send({ msg: 'something error' });
+    }
+}
 export const changePassword = async (req, res) => {
     //http://localhost:3000/userDo/raghad@gmail.com/changePassword
     const { password, newpassword } = req.body;
